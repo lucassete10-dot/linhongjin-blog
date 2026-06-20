@@ -1,0 +1,126 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap');
+
+/* ── Base fonts ── */
+body {
+  font-family: 'Lato', sans-serif;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+}
+
+/* ── Serif headings ── */
+h1, h2, h3, h4,
+.post-title,
+.entry-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* ── Accent color: rose ── */
+:root {
+  --accent: #c9856b;
+  --accent-light: #f2e0d9;
+}
+
+a {
+  color: var(--accent);
+}
+
+a:hover {
+  color: var(--accent);
+  opacity: 0.75;
+}
+
+/* ── Home hero section ── */
+.home-info-box {
+  border-left: 3px solid var(--accent);
+  padding: 2.5rem 2rem;
+  background: var(--accent-light);
+  border-radius: 2px;
+  margin-bottom: 2.5rem;
+}
+
+.home-info-box .title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #1a1a1a;
+  margin-bottom: 0.75rem;
+}
+
+.home-info-box p {
+  font-family: 'Lato', sans-serif;
+  font-weight: 300;
+  font-size: 1.05rem;
+  color: #555;
+  margin: 0;
+}
+
+/* ── Social icon color ── */
+.social-icons a svg {
+  fill: var(--accent);
+}
+
+/* ── Nav bar ── */
+.nav {
+  border-bottom: 1px solid var(--accent-light);
+}
+
+#site-header .logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #1a1a1a !important;
+}
+
+/* ── Post card ── */
+.post-entry {
+  border: none;
+  border-bottom: 1px solid #eee;
+  border-radius: 0;
+  padding: 1.8rem 0;
+  background: transparent;
+  transition: background 0.2s;
+}
+
+.post-entry:hover {
+  background: var(--accent-light);
+  padding-left: 1rem;
+  border-radius: 4px;
+}
+
+.post-entry .entry-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem;
+}
+
+/* ── Footer ── */
+footer {
+  border-top: 1px solid var(--accent-light);
+  font-size: 0.85rem;
+  color: #999;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ── Code blocks ── */
+.highlight pre {
+  border-radius: 6px;
+  border-left: 3px solid var(--accent);
+}
+
+/* ── Dark mode tweaks ── */
+.dark .home-info-box {
+  background: rgba(201, 133, 107, 0.12);
+  border-left-color: var(--accent);
+}
+
+.dark .home-info-box .title {
+  color: #f0ece8;
+}
+
+.dark .post-entry:hover {
+  background: rgba(201, 133, 107, 0.1);
+}
