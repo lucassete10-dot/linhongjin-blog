@@ -111,6 +111,55 @@ footer {
   border-left: 3px solid var(--accent);
 }
 
+/* ── Tags page: list layout ── */
+.terms-tags {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.terms-tags a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.2rem;
+  background: transparent;
+  border: 1px solid #e8e0dc;
+  border-radius: 4px;
+  color: #333;
+  font-size: 1rem;
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
+  transition: background 0.15s, border-color 0.15s;
+  text-decoration: none;
+}
+
+.terms-tags a:hover {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
+  opacity: 1;
+}
+
+.terms-tags a sup {
+  font-size: 0.75rem;
+  color: var(--accent);
+  font-weight: 700;
+  margin-left: 0.5rem;
+}
+
+.dark .terms-tags a {
+  border-color: #333;
+  color: #ccc;
+}
+
+.dark .terms-tags a:hover {
+  background: rgba(201, 133, 107, 0.12);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 /* ── Dark mode tweaks ── */
 .dark .home-info-box {
   background: rgba(201, 133, 107, 0.12);
