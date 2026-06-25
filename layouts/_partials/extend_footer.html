@@ -1,0 +1,7 @@
+{{- /* GoatCounter 访问统计 */ -}}
+{{- with site.Params.goatcounter }}
+{{- if .code }}
+<script data-goatcounter="https://{{ .code }}.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+{{- end }}
+{{- end }}

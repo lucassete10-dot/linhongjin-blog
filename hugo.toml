@@ -18,7 +18,7 @@ buildExpired = false
   defaultTheme = "auto"
   disableThemeToggle = false
   ShowReadingTime = true
-  ShowShareButtons = false
+  ShowShareButtons = true
   ShowPostNavLinks = true
   ShowBreadCrumbs = true
   ShowCodeCopyButtons = true
@@ -27,7 +27,7 @@ buildExpired = false
   UseHugoToc = true
   disableSpecial1stPost = false
   disableScrollToTop = false
-  comments = false
+  comments = true
   hidemeta = false
   hideSummary = false
   showtoc = true
@@ -52,12 +52,40 @@ buildExpired = false
   [params.label]
     text = "Flora"
 
+  # 文章封面图设置（每篇文章在 front matter 里写 cover.image 即可使用）
+  [params.cover]
+    hidden = false          # 全局是否隐藏封面
+    hiddenInList = false    # 列表页是否隐藏
+    hiddenInSingle = false  # 文章页是否隐藏
+    responsiveImages = true
+    linkFullImages = true
+
+  # GoatCounter 访问统计：在 https://www.goatcounter.com 注册后，
+  # 把你的站点代码填进 code（例如注册成 flora，就填 "flora"），统计才会生效
+  [params.goatcounter]
+    code = "flora"
+
+  # Giscus 评论（基于 GitHub Discussions）
+  # repoId / categoryId 需要在 https://giscus.app 生成后填入，填好评论区才会显示
+  [params.giscus]
+    repo = "lucassete10-dot/linhongjin-blog"
+    repoId = "R_kgDOS_3W3Q"
+    category = "Announcements"
+    categoryId = "DIC_kwDOS_3W3c4C_4Zx"
+    mapping = "pathname"
+    theme = "preferred_color_scheme"
+
 [menu]
   [[menu.main]]
     identifier = "posts"
     name = "文章"
     url = "/posts/"
     weight = 10
+  [[menu.main]]
+    identifier = "categories"
+    name = "分类"
+    url = "/categories/"
+    weight = 15
   [[menu.main]]
     identifier = "tags"
     name = "标签"
