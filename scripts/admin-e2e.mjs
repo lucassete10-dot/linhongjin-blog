@@ -28,7 +28,7 @@ try {
   await page.getByLabel('标题').fill('UI e2e article')
   await page.getByLabel('URL 标识').fill('ui-e2e-article')
   await page.getByLabel('摘要').fill('ui-e2e searchable content')
-  await page.getByLabel('正文（段落之间空一行）').fill('This item validates the visual content editor.')
+  await page.getByLabel('正文（Markdown）').fill('This item validates the Markdown content editor.')
   await page.locator('.upload-row input[type="file"]').setInputFiles(coverImage)
   await page.getByText('图片上传成功，保存内容后生效。').waitFor()
   await page.getByLabel('状态').selectOption('published')

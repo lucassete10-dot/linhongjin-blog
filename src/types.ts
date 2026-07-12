@@ -15,6 +15,7 @@ export interface ContentItem {
   suitableFor?: string
   externalUrl?: string
   coverImage?: string
+  markdown?: string
   body: string[]
 }
 

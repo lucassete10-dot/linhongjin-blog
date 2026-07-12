@@ -11,13 +11,15 @@ const supabase = createClient(url, key, {
 
 const { data, error } = await supabase
   .from('contents')
-  .select('id,title,status')
+  .select('id,title,status,markdown')
   .eq('status', 'published')
 
 if (error) throw error
 
 console.log(JSON.stringify({
   connected: true,
+  markdownColumn: true,
   publishedItems: data.length,
   titles: data.map((item) => item.title),
+  markdownBackfilled: data.every((item) => typeof item.markdown === 'string'),
 }, null, 2))

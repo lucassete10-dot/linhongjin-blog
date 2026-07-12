@@ -37,6 +37,7 @@ create table if not exists public.contents (
   suitable_for text,
   external_url text,
   cover_image text,
+  markdown text not null default '',
   body text[] not null default '{}',
   status text not null default 'draft' check (status in ('draft', 'published')),
   pinned boolean not null default false,

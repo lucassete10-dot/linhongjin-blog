@@ -18,6 +18,7 @@ interface ContentRow {
   suitable_for: string | null
   external_url: string | null
   cover_image: string | null
+  markdown: string | null
   body: string[]
   status: ContentStatus
   pinned: boolean
@@ -45,6 +46,7 @@ function rowToContent(row: ContentRow): ManagedContent {
     suitableFor: row.suitable_for ?? undefined,
     externalUrl: row.external_url ?? undefined,
     coverImage: row.cover_image ?? undefined,
+    markdown: row.markdown || (row.body ?? []).join('\n\n'),
     body: row.body ?? [],
     status: row.status,
     pinned: row.pinned,
@@ -70,6 +72,7 @@ function contentToRow(item: EditableContent) {
     suitable_for: item.suitableFor ?? null,
     external_url: item.externalUrl ?? null,
     cover_image: item.coverImage ?? null,
+    markdown: item.markdown ?? item.body.join('\n\n'),
     body: item.body,
     status: item.status,
     pinned: item.pinned,
