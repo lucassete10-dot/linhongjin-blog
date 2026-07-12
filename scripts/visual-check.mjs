@@ -25,8 +25,25 @@ try {
 
   const menuVisible = await mobile.locator('.menu-button').isVisible()
   const horizontalOverflow = await mobile.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)
+  await mobile.locator('.scroll-cue').click()
+  await mobile.waitForTimeout(1100)
+  const mobileContentOpacity = await mobile.locator('.portal-panel').evaluate((element) => getComputedStyle(element).opacity)
+  await mobile.screenshot({ path: join(outputDirectory, 'home-mobile-content.png') })
 
-  console.log(JSON.stringify({ menuVisible, horizontalOverflow }, null, 2))
+  const limitedWebView = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true })
+  await limitedWebView.addInitScript(() => {
+    class SilentIntersectionObserver {
+      observe() {}
+      disconnect() {}
+      unobserve() {}
+    }
+    Object.defineProperty(window, 'IntersectionObserver', { value: SilentIntersectionObserver })
+  })
+  await limitedWebView.goto(baseUrl, { waitUntil: 'networkidle' })
+  await limitedWebView.locator('#explore').scrollIntoViewIfNeeded()
+  const fallbackContentOpacity = await limitedWebView.locator('.portal-panel').evaluate((element) => getComputedStyle(element).opacity)
+
+  console.log(JSON.stringify({ menuVisible, horizontalOverflow, mobileContentOpacity, fallbackContentOpacity }, null, 2))
 } finally {
   await browser.close()
 }

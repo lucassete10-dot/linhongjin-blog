@@ -196,6 +196,10 @@ function HomePage() {
   useEffect(() => {
     const panel = portalPanel.current
     if (!panel) return
+    if (!('IntersectionObserver' in window)) {
+      setPortalVisible(true)
+      return
+    }
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -218,10 +222,14 @@ function HomePage() {
           <h1 id="hero-title">Help myself,<br />help others.</h1>
           <p className="hero-note">和 Flora 一起探索 AI、学习与生活里的小小可能。</p>
         </div>
-        <a className="scroll-cue" href="#explore">
+        <button
+          className="scroll-cue"
+          type="button"
+          onClick={() => document.getElementById('explore')?.scrollIntoView({ behavior: 'smooth' })}
+        >
           <span>向下探索</span>
           <i aria-hidden="true">↓</i>
-        </a>
+        </button>
         <div className="hero-orbit orbit-one" />
         <div className="hero-orbit orbit-two" />
       </section>
