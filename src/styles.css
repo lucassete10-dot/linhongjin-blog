@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap');
 
 :root {
-  font-family: 'DM Sans', 'Noto Sans SC', system-ui, sans-serif;
+  font-family: 'Noto Serif SC', 'Songti SC', STSong, 'Source Han Serif SC', serif;
   color: #142946;
   background: #f6f9fc;
   font-synthesis: none;
@@ -237,7 +237,7 @@ button {
 .hero h1 {
   margin: 0;
   color: #173455;
-  font-family: 'Playfair Display', 'Noto Sans SC', serif;
+  font-family: 'Playfair Display', 'Noto Serif SC', 'Songti SC', STSong, serif;
   font-size: clamp(52px, 6.5vw, 112px);
   font-style: italic;
   font-weight: 600;
@@ -392,7 +392,7 @@ button {
 .qq-placeholder h2 {
   margin: 5px 0 0;
   color: var(--ink);
-  font-family: 'Playfair Display', 'Noto Sans SC', serif;
+  font-family: 'Playfair Display', 'Noto Serif SC', 'Songti SC', STSong, serif;
   font-size: clamp(30px, 3.2vw, 48px);
   font-weight: 600;
   letter-spacing: -0.035em;
@@ -820,7 +820,7 @@ button {
 .admin-page h1 {
   margin: 10px 0 18px;
   color: var(--ink);
-  font-family: 'Playfair Display', 'Noto Sans SC', serif;
+  font-family: 'Playfair Display', 'Noto Serif SC', 'Songti SC', STSong, serif;
   font-size: clamp(48px, 6vw, 86px);
   font-weight: 600;
   line-height: 1.04;
@@ -989,7 +989,7 @@ button {
 }
 
 .article-header h1 {
-  font-family: 'Noto Sans SC', sans-serif;
+  font-family: 'Noto Serif SC', 'Songti SC', STSong, 'Source Han Serif SC', serif;
   font-size: clamp(38px, 5.4vw, 67px);
   line-height: 1.18;
   letter-spacing: -0.045em;
@@ -1414,7 +1414,7 @@ button {
 
 .dashboard-main h1 {
   margin: 6px 0 0;
-  font-family: 'Noto Sans SC', sans-serif;
+  font-family: 'Noto Serif SC', 'Songti SC', STSong, 'Source Han Serif SC', serif;
   font-size: 30px;
   letter-spacing: -0.03em;
 }
@@ -2121,6 +2121,109 @@ button {
   }
 }
 
+/* Elegant typography and route transitions */
+body,
+button,
+input,
+textarea,
+select {
+  font-family: 'Noto Serif SC', 'Songti SC', STSong, 'Source Han Serif SC', serif;
+}
+
+.eyebrow,
+.hero-kicker,
+.card-meta,
+.card-topline,
+.journal-date,
+.markdown-body code,
+.admin-page code {
+  font-family: 'DM Sans', 'Noto Sans SC', system-ui, sans-serif;
+}
+
+.journal-shell:not(.immersive) main > section,
+.journal-shell:not(.immersive) main > article {
+  animation: route-page-in 560ms cubic-bezier(0.2, 0.78, 0.22, 1) both;
+}
+
+.journal-shell:not(.immersive) .page-hero > *,
+.journal-shell:not(.immersive) .article-header > *,
+.journal-shell:not(.immersive) .about-copy > *,
+.journal-shell:not(.immersive) .search-page > * {
+  animation: route-item-in 520ms cubic-bezier(0.2, 0.78, 0.22, 1) both;
+}
+
+.journal-shell:not(.immersive) .page-hero > :nth-child(2),
+.journal-shell:not(.immersive) .article-header > :nth-child(2),
+.journal-shell:not(.immersive) .about-copy > :nth-child(2) {
+  animation-delay: 70ms;
+}
+
+.journal-shell:not(.immersive) .page-hero > :nth-child(3),
+.journal-shell:not(.immersive) .article-header > :nth-child(3),
+.journal-shell:not(.immersive) .about-copy > :nth-child(3) {
+  animation-delay: 130ms;
+}
+
+.journal-shell:not(.immersive) .collection-grid .content-card,
+.journal-shell:not(.immersive) .search-results .content-card,
+.journal-shell:not(.immersive) .article-body,
+.journal-shell:not(.immersive) .filter-row {
+  animation: route-card-in 560ms cubic-bezier(0.2, 0.78, 0.22, 1) both;
+}
+
+.journal-shell:not(.immersive) .collection-grid .content-card:nth-child(2),
+.journal-shell:not(.immersive) .search-results .content-card:nth-child(2) {
+  animation-delay: 70ms;
+}
+
+.journal-shell:not(.immersive) .collection-grid .content-card:nth-child(3),
+.journal-shell:not(.immersive) .search-results .content-card:nth-child(3) {
+  animation-delay: 120ms;
+}
+
+.journal-shell:not(.immersive) .collection-grid .content-card:nth-child(4),
+.journal-shell:not(.immersive) .search-results .content-card:nth-child(4) {
+  animation-delay: 170ms;
+}
+
+.journal-shell .site-nav a {
+  transition: color 220ms ease, border-color 220ms ease, background-color 220ms ease, transform 220ms ease;
+}
+
+.journal-shell .site-nav a:active {
+  transform: translateX(3px);
+}
+
+@keyframes route-page-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes route-item-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes route-card-in {
+  from { opacity: 0; transform: translateY(20px) scale(0.992); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journal-shell:not(.immersive) main > section,
+  .journal-shell:not(.immersive) main > article,
+  .journal-shell:not(.immersive) .page-hero > *,
+  .journal-shell:not(.immersive) .article-header > *,
+  .journal-shell:not(.immersive) .about-copy > *,
+  .journal-shell:not(.immersive) .search-page > *,
+  .journal-shell:not(.immersive) .collection-grid .content-card,
+  .journal-shell:not(.immersive) .search-results .content-card,
+  .journal-shell:not(.immersive) .article-body,
+  .journal-shell:not(.immersive) .filter-row {
+    animation: none;
+  }
+}
+
 /* Single-screen journal home */
 .immersive {
   height: 100svh;
@@ -2174,7 +2277,7 @@ button {
 .journal-shell:not(.immersive) .not-found h1,
 .journal-shell:not(.immersive) .admin-page h1 {
   color: #183b57;
-  font-family: 'Playfair Display', 'Noto Sans SC', serif;
+  font-family: 'Playfair Display', 'Noto Serif SC', 'Songti SC', STSong, serif;
 }
 
 .journal-shell:not(.immersive) .eyebrow,
@@ -2266,7 +2369,7 @@ button {
   align-items: flex-start;
   gap: 14px;
   color: #173b55;
-  font-family: 'Playfair Display', 'Noto Sans SC', serif;
+  font-family: 'Playfair Display', 'Noto Serif SC', 'Songti SC', STSong, serif;
   font-size: 20px;
   line-height: 1.15;
 }
@@ -2284,7 +2387,7 @@ button {
   align-items: stretch;
   gap: 8px;
   margin-top: 68px;
-  font-family: 'Playfair Display', 'Noto Sans SC', serif;
+  font-family: 'Playfair Display', 'Noto Serif SC', 'Songti SC', STSong, serif;
 }
 
 .journal-shell .site-nav > a:not(.nav-search) {
@@ -2353,7 +2456,7 @@ button {
 .journal-topline > div > p:last-child {
   margin: 4px 0 0;
   color: #697678;
-  font-family: 'Playfair Display', 'Noto Sans SC', serif;
+  font-family: 'Playfair Display', 'Noto Serif SC', 'Songti SC', STSong, serif;
   font-size: 13px;
   letter-spacing: 0.08em;
 }
@@ -2387,7 +2490,7 @@ button {
 .journal-date {
   margin: 0 0 18px;
   color: #6e7771;
-  font-family: 'Playfair Display', 'Noto Sans SC', serif;
+  font-family: 'Playfair Display', 'Noto Serif SC', 'Songti SC', STSong, serif;
   font-size: 14px;
   letter-spacing: 0.12em;
 }
@@ -2395,7 +2498,7 @@ button {
 .journal-label {
   margin: 0 0 12px;
   color: #ca684f;
-  font-family: 'Playfair Display', 'Noto Sans SC', serif;
+  font-family: 'Playfair Display', 'Noto Serif SC', 'Songti SC', STSong, serif;
   font-size: 17px;
   letter-spacing: 0.12em;
 }
@@ -2404,7 +2507,7 @@ button {
   max-width: 600px;
   margin: 0;
   color: #183b57;
-  font-family: 'Playfair Display', 'Noto Sans SC', serif;
+  font-family: 'Playfair Display', 'Noto Serif SC', 'Songti SC', STSong, serif;
   font-size: clamp(46px, 5vw, 76px);
   font-style: normal;
   font-weight: 500;
@@ -2451,7 +2554,7 @@ button {
   align-items: center;
   gap: 18px;
   color: #344f5d;
-  font-family: 'Playfair Display', 'Noto Sans SC', serif;
+  font-family: 'Playfair Display', 'Noto Serif SC', 'Songti SC', STSong, serif;
   font-size: 16px;
   letter-spacing: 0.12em;
 }
@@ -2491,7 +2594,7 @@ button {
 
 .journal-article-list strong {
   overflow: hidden;
-  font-family: 'Playfair Display', 'Noto Sans SC', serif;
+  font-family: 'Playfair Display', 'Noto Serif SC', 'Songti SC', STSong, serif;
   font-size: 15px;
   font-weight: 500;
   text-overflow: ellipsis;

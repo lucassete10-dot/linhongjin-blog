@@ -673,7 +673,7 @@ function AdminPage() {
                             <code>![图片说明](图片链接)</code>
                             <code>[链接文字](https://example.com)</code>
                           </div>
-                          <p>将完整的 B站视频地址单独放一行，预览和文章页会自动显示播放器。</p>
+                          <p>将完整的 B站或 YouTube 视频地址单独放一行，预览和文章页会自动显示播放器。</p>
                         </details>
                       </>
                     )}
