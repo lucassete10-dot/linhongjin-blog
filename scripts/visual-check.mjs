@@ -12,38 +12,59 @@ await mkdir(outputDirectory, { recursive: true })
 const browser = await chromium.launch({ executablePath: browserPath, headless: true })
 
 try {
-  const desktop = await browser.newPage({ viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 })
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 1000 },
+    deviceScaleFactor: 1,
+    permissions: ['clipboard-read', 'clipboard-write'],
+  })
+  const desktop = await context.newPage()
   await desktop.goto(baseUrl, { waitUntil: 'networkidle' })
   await desktop.screenshot({ path: join(outputDirectory, 'home-desktop.png') })
-  await desktop.locator('.scroll-cue').click()
-  await desktop.waitForTimeout(1100)
-  await desktop.screenshot({ path: join(outputDirectory, 'home-content.png') })
+
+  const homeMetrics = await desktop.evaluate(() => ({
+    horizontalOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    documentHeight: document.documentElement.scrollHeight,
+    viewportHeight: window.innerHeight,
+  }))
+
+  await desktop.goto(`${baseUrl}/#/tools`, { waitUntil: 'networkidle' })
+  const toolFilterCount = await desktop.locator('.filter-row button').count()
+  let toolFilterWorks = false
+  if (toolFilterCount > 1) {
+    const filter = desktop.locator('.filter-row button').nth(1)
+    await filter.click()
+    toolFilterWorks = await filter.getAttribute('aria-pressed') === 'true'
+  }
+  await desktop.screenshot({ path: join(outputDirectory, 'tools-filtered.png') })
+
+  await desktop.goto(`${baseUrl}/#/articles`, { waitUntil: 'networkidle' })
+  await desktop.locator('.content-card').first().click()
+  await desktop.waitForLoadState('networkidle')
+  const articleTitle = await desktop.locator('.article-header h1').innerText()
+  const documentTitle = await desktop.title()
+  const metadataWorks = documentTitle.includes(articleTitle)
+  await desktop.getByRole('button', { name: /生成海报/ }).click()
+  await desktop.locator('.poster-panel img').waitFor({ state: 'visible' })
+  const posterSource = await desktop.locator('.poster-panel img').getAttribute('src')
+  const posterWorks = Boolean(posterSource?.startsWith('data:image/png'))
+  await desktop.screenshot({ path: join(outputDirectory, 'article-share-poster.png') })
 
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true })
-  await mobile.goto(baseUrl, { waitUntil: 'networkidle' })
-  await mobile.screenshot({ path: join(outputDirectory, 'home-mobile.png') })
+  await mobile.goto(`${baseUrl}/#/articles`, { waitUntil: 'networkidle' })
+  await mobile.locator('.content-card').first().click()
+  await mobile.waitForLoadState('networkidle')
+  await mobile.locator('.article-share').scrollIntoViewIfNeeded()
+  const mobileOverflow = await mobile.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)
+  await mobile.screenshot({ path: join(outputDirectory, 'article-share-mobile.png') })
 
-  const menuVisible = await mobile.locator('.menu-button').isVisible()
-  const horizontalOverflow = await mobile.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)
-  await mobile.locator('.scroll-cue').click()
-  await mobile.waitForTimeout(1100)
-  const mobileContentOpacity = await mobile.locator('.portal-panel').evaluate((element) => getComputedStyle(element).opacity)
-  await mobile.screenshot({ path: join(outputDirectory, 'home-mobile-content.png') })
-
-  const limitedWebView = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true })
-  await limitedWebView.addInitScript(() => {
-    class SilentIntersectionObserver {
-      observe() {}
-      disconnect() {}
-      unobserve() {}
-    }
-    Object.defineProperty(window, 'IntersectionObserver', { value: SilentIntersectionObserver })
-  })
-  await limitedWebView.goto(baseUrl, { waitUntil: 'networkidle' })
-  await limitedWebView.locator('#explore').scrollIntoViewIfNeeded()
-  const fallbackContentOpacity = await limitedWebView.locator('.portal-panel').evaluate((element) => getComputedStyle(element).opacity)
-
-  console.log(JSON.stringify({ menuVisible, horizontalOverflow, mobileContentOpacity, fallbackContentOpacity }, null, 2))
+  console.log(JSON.stringify({
+    homeMetrics,
+    toolFilterCount,
+    toolFilterWorks,
+    metadataWorks,
+    posterWorks,
+    mobileOverflow,
+  }, null, 2))
 } finally {
   await browser.close()
 }
