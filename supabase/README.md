@@ -2,6 +2,8 @@
 
 1. 在 Supabase 创建一个新项目。
 2. 打开 SQL Editor，完整运行 `migrations/202607120001_initial.sql`。
+   已经运行过初始脚本的现有项目，还需要按顺序运行后续 migration，例如
+   `migrations/202607120002_markdown.sql`，以启用 Markdown 正文。
 3. 在 Authentication → Users 中创建 Flora 的邮箱密码用户。
 4. 复制该用户 UUID，在 SQL Editor 运行：
 

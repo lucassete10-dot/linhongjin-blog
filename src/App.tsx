@@ -21,6 +21,7 @@ import {
   uploadImage,
 } from './api'
 import { content as fallbackContent, contentTypeLabels, navItems } from './data'
+import { MarkdownContent } from './components/MarkdownContent'
 import type { AdminIdentity, ContentItem, ContentType, ManagedContent } from './types'
 
 const Arrow = () => <span aria-hidden="true">↗</span>
@@ -441,9 +442,7 @@ function DetailPage() {
           )}
         </header>
         <div className="article-body">
-          {item.body.map((paragraph, index) => (
-            <p key={`${item.slug}-${index}`}>{paragraph}</p>
-          ))}
+          <MarkdownContent markdown={item.markdown ?? item.body.join('\n\n')} />
           <div className="article-tags">
             {item.tags.map((tag) => <span key={tag}>#{tag}</span>)}
           </div>
@@ -522,6 +521,7 @@ function blankContent(): EditableContent {
     date: new Date().toISOString().slice(0, 10),
     readTime: '5 分钟',
     featured: false,
+    markdown: '',
     body: [],
     status: 'draft',
     pinned: false,
@@ -546,6 +546,7 @@ function AdminPage() {
   const [saving, setSaving] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [draft, setDraft] = useState<EditableContent | null>(null)
+  const [previewMarkdown, setPreviewMarkdown] = useState(false)
 
   const loadItems = async () => setItems(await fetchManagedContent())
 
@@ -578,6 +579,7 @@ function AdminPage() {
   const beginCreate = () => {
     setEditingId(null)
     setDraft(blankContent())
+    setPreviewMarkdown(false)
     setError('')
     setNotice('')
   }
@@ -585,6 +587,7 @@ function AdminPage() {
   const beginEdit = (item: ManagedContent) => {
     setEditingId(item.id)
     setDraft(editableContent(item))
+    setPreviewMarkdown(false)
     setError('')
     setNotice('')
   }
@@ -732,7 +735,47 @@ function AdminPage() {
                   {draft.type === 'tool' && <><label><span>推荐指数（1–5）</span><input type="number" min="1" max="5" value={draft.rating ?? ''} onChange={(event) => setDraft({ ...draft, rating: event.target.value ? Number(event.target.value) : undefined })} /></label><label><span>适合谁</span><input value={draft.suitableFor ?? ''} onChange={(event) => setDraft({ ...draft, suitableFor: event.target.value })} /></label></>}
                   <label className="wide"><span>外部链接</span><input type="url" value={draft.externalUrl ?? ''} onChange={(event) => setDraft({ ...draft, externalUrl: event.target.value })} placeholder="https://" /></label>
                   <label className="wide"><span>封面图</span><div className="upload-row"><input value={draft.coverImage ?? ''} onChange={(event) => setDraft({ ...draft, coverImage: event.target.value })} placeholder="上传后自动填写" /><input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={(event) => void uploadCover(event.target.files?.[0])} /></div></label>
-                  <label className="wide"><span>正文（段落之间空一行）</span><textarea className="body-editor" rows={14} value={draft.body.join('\n\n')} onChange={(event) => setDraft({ ...draft, body: event.target.value.split(/\n{2,}/) })} /></label>
+                  <div className="wide markdown-editor-field">
+                    <div className="editor-label-row">
+                      <span>正文（Markdown）</span>
+                      <div className="editor-mode-switch">
+                        <button type="button" className={!previewMarkdown ? 'active' : ''} onClick={() => setPreviewMarkdown(false)}>编辑</button>
+                        <button type="button" className={previewMarkdown ? 'active' : ''} onClick={() => setPreviewMarkdown(true)}>预览</button>
+                      </div>
+                    </div>
+                    {previewMarkdown ? (
+                      <div className="editor-markdown-preview">
+                        <MarkdownContent markdown={draft.markdown ?? draft.body.join('\n\n')} />
+                      </div>
+                    ) : (
+                      <>
+                        <textarea
+                          aria-label="正文（Markdown）"
+                          className="body-editor"
+                          rows={18}
+                          value={draft.markdown ?? draft.body.join('\n\n')}
+                          onChange={(event) => setDraft({
+                            ...draft,
+                            markdown: event.target.value,
+                            body: event.target.value.split(/\n{2,}/).map((paragraph) => paragraph.trim()).filter(Boolean),
+                          })}
+                          placeholder={'# 一级标题\n\n正文支持 **粗体**、列表、引用、代码和表格。\n\nhttps://www.bilibili.com/video/BV...'}
+                        />
+                        <details className="markdown-help">
+                          <summary>Markdown 写作提示</summary>
+                          <div>
+                            <code># 标题</code>
+                            <code>**粗体**</code>
+                            <code>- 列表</code>
+                            <code>&gt; 引用</code>
+                            <code>![图片说明](图片链接)</code>
+                            <code>[链接文字](https://example.com)</code>
+                          </div>
+                          <p>将完整的 B站视频地址单独放一行，预览和文章页会自动显示播放器。</p>
+                        </details>
+                      </>
+                    )}
+                  </div>
                 </div>
                 <div className="editor-options">
                   <label><input type="checkbox" checked={draft.pinned} onChange={(event) => setDraft({ ...draft, pinned: event.target.checked })} />置顶</label>
