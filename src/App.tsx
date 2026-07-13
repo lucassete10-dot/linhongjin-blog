@@ -21,7 +21,9 @@ import {
   uploadImage,
 } from './api'
 import { content as fallbackContent, contentTypeLabels, navItems } from './data'
+import { ArticleShare } from './components/ArticleShare'
 import { MarkdownContent } from './components/MarkdownContent'
+import { PageMeta } from './components/PageMeta'
 import type { AdminIdentity, ContentItem, ContentType, ManagedContent } from './types'
 
 const Arrow = () => <span aria-hidden="true">↗</span>
@@ -44,7 +46,17 @@ function ContentProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-    void refresh()
+    let active = true
+    fetchPublishedContent()
+      .then((nextItems) => {
+        if (active) setItems(nextItems)
+      })
+      .catch(() => {
+        if (active) setItems(fallbackItems)
+      })
+    return () => {
+      active = false
+    }
   }, [])
 
   return <ContentContext.Provider value={{ items, refresh }}>{children}</ContentContext.Provider>
@@ -84,11 +96,9 @@ function SiteHeader() {
     resource: '/resources',
   }[detailType] : undefined
 
-  useEffect(() => setOpen(false), [location.pathname])
-
   return (
     <header className="site-header">
-      <Link className="brand" to="/" aria-label="Help Myself 首页">
+      <Link className="brand" to="/" aria-label="Help Myself 首页" onClick={() => setOpen(false)}>
         <span className="brand-star">✦</span>
         <span>Help Myself</span>
       </Link>
@@ -108,11 +118,12 @@ function SiteHeader() {
             to={item.to}
             end={item.to === '/'}
             className={({ isActive }) => (isActive || item.to === detailSection ? 'active' : undefined)}
+            onClick={() => setOpen(false)}
           >
             {item.label}
           </NavLink>
         ))}
-        <Link className="nav-search" to="/search" aria-label="搜索">
+        <Link className="nav-search" to="/search" aria-label="搜索" onClick={() => setOpen(false)}>
           搜索
           <span>⌕</span>
         </Link>
@@ -214,7 +225,7 @@ function HomePage() {
           {featuredArticle && (
             <article className="journal-feature">
               <p className="journal-date">{featuredArticle.date.replaceAll('-', '.')} · FLORA</p>
-              <p className="journal-label">最新故事</p>
+              <p className="journal-label">推荐阅读</p>
               <h1 id="hero-title">{featuredArticle.title}</h1>
               <p className="journal-summary">{featuredArticle.summary}</p>
               <Link className="journal-read-button" to={`/content/${featuredArticle.slug}`}>阅读全文 <Arrow /></Link>
@@ -245,10 +256,34 @@ const collectionConfig: Record<string, { title: string; eyebrow: string; descrip
   projects: { title: '项目作品', eyebrow: 'Building in public', description: '展示结果，也诚实记录制作过程里遇到的问题。', type: 'project' },
 }
 
+const toolFilters = ['全部', '使用体感', 'AI 对话', '自我提升', '学习', '效率办公'] as const
+type ToolFilter = (typeof toolFilters)[number]
+
+function toolMatchesFilter(item: ManagedContent, filter: ToolFilter) {
+  if (filter === '全部') return true
+  const text = [item.title, item.eyebrow, item.summary, item.category, ...item.tags].join(' ').toLowerCase()
+  const keywords: Record<Exclude<ToolFilter, '全部'>, string[]> = {
+    使用体感: ['使用体感', '体验', '评测'],
+    'AI 对话': ['ai 对话', '对话工具', '聊天'],
+    自我提升: ['自我提升', '复盘', '成长'],
+    学习: ['学习', '知识', '阅读'],
+    效率办公: ['效率', '办公', '工作流'],
+  }
+  return keywords[filter].some((keyword) => text.includes(keyword))
+}
+
 function CollectionPage({ page }: { page: keyof typeof collectionConfig }) {
   const { items: allItems } = useContent()
+  const [toolFilter, setToolFilter] = useState<ToolFilter>('全部')
   const config = collectionConfig[page]
   const items = allItems.filter((item) => item.type === config.type)
+  const availableToolFilters = toolFilters.filter((filter) => (
+    filter === '全部' || items.some((item) => toolMatchesFilter(item, filter))
+  ))
+  const activeToolFilter = availableToolFilters.includes(toolFilter) ? toolFilter : '全部'
+  const visibleItems = page === 'tools'
+    ? items.filter((item) => toolMatchesFilter(item, activeToolFilter))
+    : items
 
   return (
     <Layout>
@@ -258,16 +293,27 @@ function CollectionPage({ page }: { page: keyof typeof collectionConfig }) {
         <p>{config.description}</p>
       </section>
       <section className="page-content">
-        {page === 'tools' && (
-          <div className="filter-row">
-            {['全部', '使用体感', 'AI 对话', '自我提升', '学习', '效率办公'].map((label) => (
-              <button key={label} className={label === '全部' ? 'active' : ''}>{label}</button>
+        {page === 'tools' && availableToolFilters.length > 1 && (
+          <div className="filter-row" aria-label="筛选 AI 工具">
+            {availableToolFilters.map((label) => (
+              <button
+                key={label}
+                type="button"
+                className={label === activeToolFilter ? 'active' : ''}
+                aria-pressed={label === activeToolFilter}
+                onClick={() => setToolFilter(label)}
+              >
+                {label}
+              </button>
             ))}
           </div>
         )}
         <div className="collection-grid">
-          {items.map((item) => <ContentCard key={item.slug} item={item} />)}
+          {visibleItems.map((item) => <ContentCard key={item.slug} item={item} />)}
         </div>
+        {page === 'tools' && visibleItems.length === 0 && (
+          <div className="no-results"><span>✦</span><h2>这个分类还在积累中</h2><p>可以先看看其他分类，Flora 会在真实使用后继续补充。</p></div>
+        )}
       </section>
     </Layout>
   )
@@ -283,7 +329,7 @@ function ResourcePage() {
       </section>
       <section className="page-content">
         <div className="empty-state">
-          <div className="empty-stars">✦　·　✧</div>
+          <div className="empty-stars">✦ · ✧</div>
           <span>正在整理中</span>
           <h2>第一个资源包，还在路上。</h2>
           <p>这里暂时不会放置虚假的下载按钮。等 Flora 找到值得分享的内容，再认真补充说明和来源。</p>
@@ -348,6 +394,7 @@ function DetailPage() {
           <div className="article-tags">
             {item.tags.map((tag) => <span key={tag}>#{tag}</span>)}
           </div>
+          <ArticleShare item={item} />
         </div>
       </article>
     </Layout>
@@ -373,13 +420,15 @@ function SearchPage() {
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const next = new URLSearchParams(params)
-    value.trim() ? next.set('q', value.trim()) : next.delete('q')
+    if (value.trim()) next.set('q', value.trim())
+    else next.delete('q')
     setParams(next)
   }
 
   const setType = (nextType: ContentType | null) => {
     const next = new URLSearchParams(params)
-    nextType ? next.set('type', nextType) : next.delete('type')
+    if (nextType) next.set('type', nextType)
+    else next.delete('type')
     setParams(next)
   }
 
@@ -713,9 +762,12 @@ function NotFoundPage() {
   )
 }
 
-export default function App() {
+function AppContent() {
+  const { items } = useContent()
+
   return (
-    <ContentProvider>
+    <>
+      <PageMeta items={items} />
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -730,6 +782,14 @@ export default function App() {
         <Route path="/admin" element={<AdminPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+    </>
+  )
+}
+
+export default function App() {
+  return (
+    <ContentProvider>
+      <AppContent />
     </ContentProvider>
   )
 }
