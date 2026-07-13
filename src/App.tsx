@@ -189,7 +189,10 @@ function HomePage() {
   const { items } = useContent()
   const portalPanel = useRef<HTMLDivElement>(null)
   const [portalVisible, setPortalVisible] = useState(false)
-  const articles = items.filter((item) => item.type === 'article').slice(0, 2)
+  const allArticles = items.filter((item) => item.type === 'article')
+  const articles = allArticles.slice(0, 2)
+  const featuredArticle = allArticles[0]
+  const recentArticles = allArticles.slice(1, 3)
   const tools = items.filter((item) => item.type === 'tool').slice(0, 2)
   const podcast = items.find((item) => item.type === 'podcast')
   const project = items.find((item) => item.type === 'project')
@@ -218,10 +221,60 @@ function HomePage() {
     <Layout immersive>
       <section className="hero" aria-labelledby="hero-title">
         <div className="hero-overlay" />
-        <div className="hero-copy">
-          <p className="hero-kicker"><span>✦</span> Flora's AI learning space</p>
-          <h1 id="hero-title">Help myself,<br />help others.</h1>
-          <p className="hero-note">和 Flora 一起探索 AI、学习与生活里的小小可能。</p>
+        <div className="home-dashboard">
+          <section className="dashboard-profile glass-card">
+            <div className="dashboard-avatar" aria-hidden="true" />
+            <div>
+              <p className="hero-kicker"><span>✦</span> Flora's field notes</p>
+              <h1 id="hero-title">Help myself,<br />help others.</h1>
+              <p className="hero-note">记录 AI、学习与生活里真正帮助过我的内容，也希望它们恰好能帮助到你。</p>
+            </div>
+          </section>
+
+          <section className="dashboard-search glass-card" aria-label="搜索内容">
+            <div>
+              <p className="eyebrow">Welcome to my space</p>
+              <h2>你好，我是 Flora。</h2>
+            </div>
+            <SearchBox compact />
+          </section>
+
+          {featuredArticle && (
+            <article className="dashboard-feature glass-card">
+              <p className="eyebrow">本周新篇 · Latest story</p>
+              <div>
+                <p className="card-category">{featuredArticle.category}</p>
+                <h2>{featuredArticle.title}</h2>
+                <p>{featuredArticle.summary}</p>
+              </div>
+              <Link className="dashboard-button" to={`/content/${featuredArticle.slug}`}>开始阅读 <Arrow /></Link>
+            </article>
+          )}
+
+          <section className="dashboard-recent glass-card">
+            <div className="dashboard-card-heading">
+              <div><p className="eyebrow">Recent writing</p><h2>最近文章</h2></div>
+              <Link to="/articles">查看全部 <Arrow /></Link>
+            </div>
+            <div className="dashboard-article-list">
+              {recentArticles.map((item) => (
+                <Link to={`/content/${item.slug}`} key={item.slug}>
+                  <span className="dashboard-article-index">✦</span>
+                  <span><strong>{item.title}</strong><small>{item.date} · {item.readTime}</small></span>
+                  <Arrow />
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          <div className="dashboard-quick-grid">
+            <Link className="dashboard-quick glass-card" to="/tools">
+              <span>AI</span><div><p className="eyebrow">Field notes</p><h3>AI 工具导航</h3></div><Arrow />
+            </Link>
+            <Link className="dashboard-quick glass-card" to="/podcasts">
+              <span>♫</span><div><p className="eyebrow">Listening</p><h3>播客感悟</h3></div><Arrow />
+            </Link>
+          </div>
         </div>
         <button
           className="scroll-cue"
@@ -231,8 +284,6 @@ function HomePage() {
           <span>向下探索</span>
           <i aria-hidden="true">↓</i>
         </button>
-        <div className="hero-orbit orbit-one" />
-        <div className="hero-orbit orbit-two" />
       </section>
 
       <section className="portal" id="explore">
