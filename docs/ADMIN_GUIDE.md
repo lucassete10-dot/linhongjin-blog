@@ -18,7 +18,7 @@
 
 内容保存在 Supabase Postgres，封面保存在 `content-images` Storage bucket。
 
-## 3. Markdown 与 B站视频
+## 3. Markdown 与视频
 
 正文支持常用 Markdown：
 
@@ -46,6 +46,14 @@ https://www.bilibili.com/video/BV1xxxxxxxxx/
 ```
 
 支持 BV 号、av 号和多 P 视频的 `?p=2` 参数。短链接 `b23.tv` 请先在浏览器中打开，再复制跳转后的完整 B站链接。
+
+YouTube 链接同样单独放一行即可自动显示播放器：
+
+```text
+https://www.youtube.com/watch?v=xxxxxxxxxxx
+```
+
+也支持 `youtu.be` 短链接、Shorts、Live 和带开始时间的 `?t=90` 链接。
 
 ## 4. 主要字段
 

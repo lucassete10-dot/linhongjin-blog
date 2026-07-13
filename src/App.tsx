@@ -73,6 +73,16 @@ function ScrollToTop() {
 function SiteHeader() {
   const [open, setOpen] = useState(false)
   const location = useLocation()
+  const { items } = useContent()
+  const detailSlug = location.pathname.match(/^\/content\/([^/]+)/)?.[1]
+  const detailType = detailSlug ? items.find((item) => item.slug === detailSlug)?.type : undefined
+  const detailSection = detailType ? {
+    article: '/articles',
+    tool: '/tools',
+    podcast: '/podcasts',
+    project: '/projects',
+    resource: '/resources',
+  }[detailType] : undefined
 
   useEffect(() => setOpen(false), [location.pathname])
 
@@ -96,7 +106,8 @@ function SiteHeader() {
           <NavLink
             key={item.to}
             to={item.to}
-            className={({ isActive }) => (isActive ? 'active' : undefined)}
+            end={item.to === '/'}
+            className={({ isActive }) => (isActive || item.to === detailSection ? 'active' : undefined)}
           >
             {item.label}
           </NavLink>
@@ -129,7 +140,7 @@ function Footer() {
 
 function Layout({ children, immersive = false }: { children: React.ReactNode; immersive?: boolean }) {
   return (
-    <div className={immersive ? 'app immersive' : 'app'}>
+    <div className={immersive ? 'app journal-shell immersive' : 'app journal-shell'}>
       <SiteHeader />
       <main>{children}</main>
       <Footer />
