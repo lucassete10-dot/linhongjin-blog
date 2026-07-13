@@ -1,4 +1,4 @@
-import { FormEvent, createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { FormEvent, createContext, useContext, useEffect, useMemo, useState } from 'react'
 import {
   Link,
   NavLink,
@@ -181,206 +181,46 @@ function ContentCard({ item, large = false }: { item: ContentItem; large?: boole
   )
 }
 
-function MiniEmpty({ label }: { label: string }) {
-  return <div className="mini-empty"><span>✦</span><p>{label}</p></div>
-}
-
 function HomePage() {
   const { items } = useContent()
-  const portalPanel = useRef<HTMLDivElement>(null)
-  const [portalVisible, setPortalVisible] = useState(false)
   const allArticles = items.filter((item) => item.type === 'article')
-  const articles = allArticles.slice(0, 2)
   const featuredArticle = allArticles[0]
-  const recentArticles = allArticles.slice(1, 3)
-  const tools = items.filter((item) => item.type === 'tool').slice(0, 2)
-  const podcast = items.find((item) => item.type === 'podcast')
-  const project = items.find((item) => item.type === 'project')
-
-  useEffect(() => {
-    const panel = portalPanel.current
-    if (!panel) return
-    if (!('IntersectionObserver' in window)) {
-      setPortalVisible(true)
-      return
-    }
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setPortalVisible(true)
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.05 },
-    )
-    observer.observe(panel)
-    return () => observer.disconnect()
-  }, [])
+  const recentArticles = allArticles.slice(1, 4)
 
   return (
     <Layout immersive>
-      <section className="hero" aria-labelledby="hero-title">
+      <section className="hero journal-hero" aria-labelledby="hero-title">
         <div className="hero-overlay" />
-        <div className="home-dashboard">
-          <section className="dashboard-profile glass-card">
-            <div className="dashboard-avatar" aria-hidden="true" />
+        <div className="journal-stage">
+          <div className="journal-topline">
             <div>
               <p className="hero-kicker"><span>✦</span> Flora's field notes</p>
-              <h1 id="hero-title">Help myself,<br />help others.</h1>
-              <p className="hero-note">记录 AI、学习与生活里真正帮助过我的内容，也希望它们恰好能帮助到你。</p>
-            </div>
-          </section>
-
-          <section className="dashboard-search glass-card" aria-label="搜索内容">
-            <div>
-              <p className="eyebrow">Welcome to my space</p>
-              <h2>你好，我是 Flora。</h2>
+              <p>Help myself, help others.</p>
             </div>
             <SearchBox compact />
-          </section>
+          </div>
 
           {featuredArticle && (
-            <article className="dashboard-feature glass-card">
-              <p className="eyebrow">本周新篇 · Latest story</p>
-              <div>
-                <p className="card-category">{featuredArticle.category}</p>
-                <h2>{featuredArticle.title}</h2>
-                <p>{featuredArticle.summary}</p>
-              </div>
-              <Link className="dashboard-button" to={`/content/${featuredArticle.slug}`}>开始阅读 <Arrow /></Link>
+            <article className="journal-feature">
+              <p className="journal-date">{featuredArticle.date.replaceAll('-', '.')} · FLORA</p>
+              <p className="journal-label">最新故事</p>
+              <h1 id="hero-title">{featuredArticle.title}</h1>
+              <p className="journal-summary">{featuredArticle.summary}</p>
+              <Link className="journal-read-button" to={`/content/${featuredArticle.slug}`}>阅读全文 <Arrow /></Link>
             </article>
           )}
 
-          <section className="dashboard-recent glass-card">
-            <div className="dashboard-card-heading">
-              <div><p className="eyebrow">Recent writing</p><h2>最近文章</h2></div>
-              <Link to="/articles">查看全部 <Arrow /></Link>
-            </div>
-            <div className="dashboard-article-list">
+          <section className="journal-recent" aria-label="往期文章">
+            <div className="journal-section-title"><span>往期文章</span><i /></div>
+            <div className="journal-article-list">
               {recentArticles.map((item) => (
                 <Link to={`/content/${item.slug}`} key={item.slug}>
-                  <span className="dashboard-article-index">✦</span>
-                  <span><strong>{item.title}</strong><small>{item.date} · {item.readTime}</small></span>
-                  <Arrow />
+                  <strong>{item.title}</strong>
+                  <span>{item.date.replaceAll('-', '.')}</span>
                 </Link>
               ))}
             </div>
           </section>
-
-          <div className="dashboard-quick-grid">
-            <Link className="dashboard-quick glass-card" to="/tools">
-              <span>AI</span><div><p className="eyebrow">Field notes</p><h3>AI 工具导航</h3></div><Arrow />
-            </Link>
-            <Link className="dashboard-quick glass-card" to="/podcasts">
-              <span>♫</span><div><p className="eyebrow">Listening</p><h3>播客感悟</h3></div><Arrow />
-            </Link>
-          </div>
-        </div>
-        <button
-          className="scroll-cue"
-          type="button"
-          onClick={() => document.getElementById('explore')?.scrollIntoView({ behavior: 'smooth' })}
-        >
-          <span>向下探索</span>
-          <i aria-hidden="true">↓</i>
-        </button>
-      </section>
-
-      <section className="portal" id="explore">
-        <div className="portal-glow" />
-        <div ref={portalPanel} className={portalVisible ? 'portal-panel is-visible' : 'portal-panel'}>
-          <div className="section-heading intro-heading">
-            <div>
-              <p className="eyebrow">Explore the space</p>
-              <h2>从一个好问题开始</h2>
-            </div>
-            <p>这里没有唯一正确的学习路线，只有 Flora 真正使用过、思考过，也愿意分享给你的内容。</p>
-          </div>
-          <SearchBox />
-
-          <div className="home-block">
-            <div className="block-heading">
-              <div>
-                <p className="eyebrow">Latest writing</p>
-                <h2>最新文章</h2>
-              </div>
-              <Link to="/articles">查看全部 <Arrow /></Link>
-            </div>
-            <div className="card-grid two-col">
-              {articles.map((item, index) => <ContentCard key={item.slug} item={item} large={index === 0} />)}
-            </div>
-          </div>
-
-          <div className="home-block tools-block">
-            <div className="block-heading">
-              <div>
-                <p className="eyebrow">AI field notes</p>
-                <h2>AI 工具导航</h2>
-              </div>
-              <Link to="/tools">查看全部 <Arrow /></Link>
-            </div>
-            <div className="tool-categories" aria-label="AI 工具分类">
-              {['使用体感', 'AI 对话', '自我提升', '学习', '效率办公'].map((label, index) => (
-                <Link to="/tools" key={label}>
-                  <span>0{index + 1}</span>
-                  {label}
-                </Link>
-              ))}
-            </div>
-            <div className="card-grid two-col">
-              {tools.map((item) => <ContentCard key={item.slug} item={item} />)}
-            </div>
-          </div>
-
-          <div className="resource-banner">
-            <div>
-              <p className="eyebrow">Resource library</p>
-              <h2>把真正有用的东西，慢慢整理在一起。</h2>
-              <p>资源库正在准备中。以后这里会放 Flora 亲自筛选和说明过的学习资源。</p>
-            </div>
-            <Link className="circle-link" to="/resources" aria-label="前往资源库"><Arrow /></Link>
-          </div>
-
-          <div className="home-split">
-            <div>
-              <div className="block-heading compact-heading">
-                <div>
-                  <p className="eyebrow">Listening notes</p>
-                  <h2>播客感悟</h2>
-                </div>
-              </div>
-              {podcast ? <ContentCard item={podcast} /> : <MiniEmpty label="暂无播客感悟" />}
-            </div>
-            <div>
-              <div className="block-heading compact-heading">
-                <div>
-                  <p className="eyebrow">Building in public</p>
-                  <h2>项目作品</h2>
-                </div>
-              </div>
-              {project ? <ContentCard item={project} /> : <MiniEmpty label="暂无项目" />}
-            </div>
-          </div>
-
-          <div className="meet-flora">
-            <div className="flora-avatar" aria-hidden="true" />
-            <div>
-              <p className="eyebrow">Meet Flora</p>
-              <h2>你好，我是 Flora。</h2>
-              <p>一个正在学习如何使用 AI，也愿意把过程分享出来的普通创作者。</p>
-            </div>
-            <Link to="/about">认识我 <Arrow /></Link>
-          </div>
-
-          <div className="qq-placeholder">
-            <span className="qq-icon">Q</span>
-            <div>
-              <p className="eyebrow">Community</p>
-              <h2>QQ 群正在筹备中</h2>
-              <p>等这里准备好，我们可以一起聊 AI、学习和正在做的项目。</p>
-            </div>
-            <span className="status-pill">Coming soon</span>
-          </div>
         </div>
       </section>
     </Layout>
