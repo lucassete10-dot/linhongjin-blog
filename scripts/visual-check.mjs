@@ -52,6 +52,12 @@ try {
   }
   await desktop.screenshot({ path: join(outputDirectory, 'tools-filtered.png') })
 
+  await desktop.goto(`${baseUrl}/#/content/wechat-voice-input-with-codex`, { waitUntil: 'domcontentloaded' })
+  await desktop.waitForTimeout(700)
+  const voiceArticlePublished = await desktop.getByRole('heading', { name: /用微信语音输入直接与 Codex 协作/ }).isVisible().catch(() => false)
+  const voiceArticleCoverVisible = await desktop.locator('.article-feature-image img').isVisible().catch(() => false)
+  await desktop.screenshot({ path: join(outputDirectory, 'voice-codex-article.png') })
+
   await desktop.goto(`${baseUrl}/#/articles`, { waitUntil: 'domcontentloaded' })
   await desktop.waitForTimeout(700)
   await desktop.locator('.content-card').first().click()
@@ -96,6 +102,8 @@ try {
     projectCardCount,
     toolFilterCount,
     toolFilterWorks,
+    voiceArticlePublished,
+    voiceArticleCoverVisible,
     metadataWorks,
     posterWorks,
     bilibiliEmbedWorks,
