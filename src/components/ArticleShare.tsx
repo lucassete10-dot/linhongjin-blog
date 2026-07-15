@@ -68,56 +68,56 @@ async function createPoster(item: ContentItem, url: string) {
   const context = canvas.getContext('2d')
   if (!context) throw new Error('当前浏览器无法生成海报。')
 
-  const backgroundSource = item.coverImage || `${window.location.origin}/images/flora-winter-clean-v2.webp`
+  const backgroundSource = item.coverImage || `${window.location.origin}/images/botanical-hero-v1.webp`
   let background: HTMLImageElement
   try {
     background = await loadImage(backgroundSource)
   } catch {
-    background = await loadImage(`${window.location.origin}/images/flora-winter-clean-v2.webp`)
+    background = await loadImage(`${window.location.origin}/images/botanical-hero-v1.webp`)
   }
 
   drawCoverImage(context, background, width, height)
 
   const wash = context.createLinearGradient(0, 0, 0, height)
-  wash.addColorStop(0, 'rgba(238, 248, 255, 0.2)')
-  wash.addColorStop(0.38, 'rgba(244, 249, 250, 0.72)')
-  wash.addColorStop(1, 'rgba(255, 250, 240, 0.98)')
+  wash.addColorStop(0, 'rgba(4, 7, 5, 0.14)')
+  wash.addColorStop(0.38, 'rgba(5, 8, 6, 0.64)')
+  wash.addColorStop(1, 'rgba(5, 8, 6, 0.98)')
   context.fillStyle = wash
   context.fillRect(0, 0, width, height)
 
-  context.fillStyle = 'rgba(255, 255, 255, 0.82)'
+  context.fillStyle = 'rgba(12, 17, 13, 0.9)'
   context.beginPath()
   context.roundRect(72, 470, 936, 880, 42)
   context.fill()
 
-  context.fillStyle = '#d9a93b'
+  context.fillStyle = '#d9e68d'
   context.beginPath()
   context.arc(128, 552, 31, 0, Math.PI * 2)
   context.fill()
-  context.fillStyle = '#ffffff'
-  context.font = '600 28px serif'
+  context.fillStyle = '#0b0e0a'
+  context.font = '700 25px "Outfit", sans-serif'
   context.textAlign = 'center'
-  context.fillText('✦', 128, 563)
+  context.fillText('F', 128, 562)
 
   context.textAlign = 'left'
-  context.fillStyle = '#183b57'
-  context.font = '600 32px "Noto Serif SC", "Songti SC", serif'
+  context.fillStyle = '#f4f1e8'
+  context.font = '650 32px "Outfit", "Noto Sans SC", sans-serif'
   context.fillText('Help Myself', 180, 563)
-  context.fillStyle = '#6b7f8d'
-  context.font = '500 23px "Noto Serif SC", "Songti SC", serif'
+  context.fillStyle = '#a7ada4'
+  context.font = '500 23px "Outfit", "Noto Sans SC", sans-serif'
   context.fillText('Help myself, help others.', 180, 602)
 
-  context.fillStyle = '#c76049'
-  context.font = '600 24px "Noto Serif SC", "Songti SC", serif'
+  context.fillStyle = '#d9e68d'
+  context.font = '650 24px "Outfit", "Noto Sans SC", sans-serif'
   context.fillText(item.category || 'Flora 的学习记录', 112, 686)
 
-  context.fillStyle = '#183b57'
-  context.font = '600 64px "Noto Serif SC", "Songti SC", serif'
+  context.fillStyle = '#f4f1e8'
+  context.font = '650 64px "Outfit", "Noto Sans SC", sans-serif'
   const titleLines = wrapText(context, item.title, 820, 3)
   titleLines.forEach((line, index) => context.fillText(line, 112, 780 + index * 86))
 
-  context.fillStyle = '#526b77'
-  context.font = '400 28px "Noto Serif SC", "Songti SC", serif'
+  context.fillStyle = '#b9beb5'
+  context.font = '400 28px "Outfit", "Noto Sans SC", sans-serif'
   const summaryLines = wrapText(context, item.summary, 820, 3)
   const summaryTop = 820 + titleLines.length * 86
   summaryLines.forEach((line, index) => context.fillText(line, 112, summaryTop + index * 46))
@@ -126,19 +126,19 @@ async function createPoster(item: ContentItem, url: string) {
   const qrCode = await loadImage(await toDataURL(url, {
     width: 210,
     margin: 1,
-    color: { dark: '#183b57', light: '#fffaf0' },
+    color: { dark: '#0b0e0a', light: '#f4f1e8' },
   }))
-  context.fillStyle = '#fffaf0'
+  context.fillStyle = '#f4f1e8'
   context.beginPath()
   context.roundRect(112, 1080, 238, 238, 24)
   context.fill()
   context.drawImage(qrCode, 126, 1094, 210, 210)
 
-  context.fillStyle = '#183b57'
-  context.font = '600 27px "Noto Serif SC", "Songti SC", serif'
+  context.fillStyle = '#f4f1e8'
+  context.font = '650 27px "Outfit", "Noto Sans SC", sans-serif'
   context.fillText('扫码阅读全文', 390, 1160)
-  context.fillStyle = '#6b7f8d'
-  context.font = '400 22px "Noto Serif SC", "Songti SC", serif'
+  context.fillStyle = '#a7ada4'
+  context.font = '400 22px "Outfit", "Noto Sans SC", sans-serif'
   context.fillText(`${item.date}  ·  ${item.readTime}`, 390, 1206)
   context.fillText('linhongjin.top', 390, 1255)
 
