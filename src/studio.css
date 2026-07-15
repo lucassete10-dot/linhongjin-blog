@@ -547,7 +547,15 @@
   box-shadow: 12px 12px 0 var(--studio-ink);
 }
 
-.studio-notes h2 { max-width: 900px; margin: 0; font-size: clamp(40px, 5.8vw, 76px); font-weight: 800; line-height: 1.02; letter-spacing: -0.06em; }
+.studio-notes h2 {
+  max-width: 900px;
+  margin: 0;
+  font-size: clamp(40px, 5.2vw, 68px);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.06em;
+  text-wrap: balance;
+}
 
 .studio-note-controls { display: grid; grid-template-columns: auto 48px 48px; align-items: center; gap: 8px; }
 .studio-note-controls span { margin-right: 10px; font-size: 12px; font-weight: 700; }
@@ -563,7 +571,14 @@
 }
 
 .studio-pin-title { align-self: start; }
-.studio-pin-title h2 { font-size: clamp(46px, 5.5vw, 72px); }
+.studio-pin-title h2 {
+  max-width: 520px;
+  margin: 0;
+  font-size: clamp(38px, 4.1vw, 56px);
+  line-height: 1.04;
+  letter-spacing: -0.055em;
+  text-wrap: balance;
+}
 
 .studio-principle-stack { display: grid; gap: 24px; }
 .studio-stack-card {

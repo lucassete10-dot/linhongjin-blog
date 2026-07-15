@@ -22,7 +22,7 @@ import {
 import { content as fallbackContent, contentTypeLabels, navItems } from './data'
 import { ArticleShare } from './components/ArticleShare'
 import { BrandMark } from './components/BrandMark'
-import { useRouteEntrance, useStudioMotion } from './components/StudioMotion'
+import { useRouteEntrance, useStudioLayoutSync, useStudioMotion } from './components/StudioMotion'
 import { MarkdownContent } from './components/MarkdownContent'
 import { PageMeta } from './components/PageMeta'
 import type { AdminIdentity, ContentItem, ContentType, ManagedContent } from './types'
@@ -250,6 +250,7 @@ function HomePage() {
   const scope = useRef<HTMLDivElement>(null)
   const [noteIndex, setNoteIndex] = useState(0)
   useStudioMotion(scope)
+  useStudioLayoutSync(scope, items.map((item) => `${item.id}:${item.updatedAt}`).join('|'))
   const catalog = withFallbackContent(items)
   const stories = catalog.filter((item) => item.type !== 'project' && item.type !== 'resource').slice(0, 5)
   const projects = catalog.filter((item) => item.type === 'project')
@@ -320,7 +321,7 @@ function HomePage() {
         <section className="studio-pin-section">
           <div className="studio-pin-title">
             <p>内容原则</p>
-            <h2>不追求信息更多，<br />只追求判断更清楚。</h2>
+            <h2>不追求信息更多，只追求判断更清楚。</h2>
           </div>
           <div className="studio-principle-stack">
             <article className="studio-stack-card tone-cyan"><span>从真实问题开始</span><h3>只记录真正遇见、使用和思考过的事情。</h3><p>内容来自实际学习过程，不复制工具说明书。</p></article>
