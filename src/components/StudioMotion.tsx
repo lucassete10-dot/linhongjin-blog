@@ -62,9 +62,43 @@ export function useStudioMotion(scope: RefObject<HTMLElement | null>) {
       const title = scope.current?.querySelector<HTMLElement>('.studio-pin-title')
       const section = scope.current?.querySelector<HTMLElement>('.studio-pin-section')
       if (!title || !section) return
-      ScrollTrigger.create({ trigger: section, start: 'top 110px', end: 'bottom bottom', pin: title, pinSpacing: false })
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top 110px',
+        end: 'bottom bottom',
+        pin: title,
+        pinSpacing: false,
+        invalidateOnRefresh: true,
+        anticipatePin: 1,
+      })
     })
 
     return () => media.revert()
   }, { scope })
+}
+
+export function useStudioLayoutSync(
+  scope: RefObject<HTMLElement | null>,
+  layoutKey: string,
+) {
+  useGSAP(() => {
+    if (prefersReducedMotion()) return
+
+    let active = true
+    const refresh = () => {
+      if (active) ScrollTrigger.refresh()
+    }
+    const frame = window.requestAnimationFrame(refresh)
+    const pendingImages = Array.from(scope.current?.querySelectorAll('img') ?? [])
+      .filter((image) => !image.complete)
+
+    pendingImages.forEach((image) => image.addEventListener('load', refresh, { once: true }))
+    void document.fonts?.ready.then(refresh)
+
+    return () => {
+      active = false
+      window.cancelAnimationFrame(frame)
+      pendingImages.forEach((image) => image.removeEventListener('load', refresh))
+    }
+  }, { scope, dependencies: [layoutKey], revertOnUpdate: true })
 }

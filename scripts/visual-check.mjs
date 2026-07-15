@@ -36,6 +36,40 @@ try {
   await desktop.waitForTimeout(700)
   await desktop.screenshot({ path: join(outputDirectory, 'home-project-desktop.png') })
 
+  const pinOverlap = await desktop.evaluate(async () => {
+    const notes = document.querySelector('.studio-notes')
+    const pinTitle = document.querySelector('.studio-pin-title')
+    const pinSection = document.querySelector('.studio-pin-section')
+    if (!notes || !pinTitle || !pinSection) return { maxOverlapPixels: -1, worstScrollY: 0 }
+
+    const notesTop = notes.getBoundingClientRect().top + window.scrollY
+    const sectionTop = pinSection.getBoundingClientRect().top + window.scrollY
+    let maxOverlapPixels = 0
+    let worstScrollY = notesTop
+
+    for (let scrollY = Math.max(0, notesTop - 180); scrollY <= sectionTop + 240; scrollY += 50) {
+      window.scrollTo(0, scrollY)
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+      const notesRect = notes.getBoundingClientRect()
+      const titleRect = pinTitle.getBoundingClientRect()
+      const horizontalOverlap = Math.min(notesRect.right, titleRect.right) - Math.max(notesRect.left, titleRect.left)
+      const verticalOverlap = Math.min(notesRect.bottom, titleRect.bottom) - Math.max(notesRect.top, titleRect.top)
+      const overlap = horizontalOverlap > 0 ? Math.max(0, verticalOverlap) : 0
+      if (overlap > maxOverlapPixels) {
+        maxOverlapPixels = overlap
+        worstScrollY = scrollY
+      }
+    }
+
+    return { maxOverlapPixels: Math.round(maxOverlapPixels), worstScrollY: Math.round(worstScrollY) }
+  })
+  await desktop.evaluate((scrollY) => window.scrollTo(0, scrollY), pinOverlap.worstScrollY)
+  await desktop.waitForTimeout(150)
+  await desktop.screenshot({ path: join(outputDirectory, 'home-scroll-transition.png') })
+  if (pinOverlap.maxOverlapPixels > 0) {
+    throw new Error(`首页滚动区文字发生 ${pinOverlap.maxOverlapPixels}px 重叠。`)
+  }
+
   await desktop.goto(`${baseUrl}/#/projects`, { waitUntil: 'domcontentloaded' })
   await desktop.waitForTimeout(700)
   await desktop.screenshot({ path: join(outputDirectory, 'projects-desktop.png') })
@@ -90,6 +124,7 @@ try {
 
   console.log(JSON.stringify({
     homeMetrics,
+    pinOverlap,
     mobileHomeOverflow,
     projectCardCount,
     toolFilterCount,
