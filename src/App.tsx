@@ -21,26 +21,57 @@ import {
 } from './api'
 import { content as fallbackContent, contentTypeLabels, navItems } from './data'
 import { ArticleShare } from './components/ArticleShare'
-import { useBotanicalMotion, useRouteEntrance } from './components/BotanicalMotion'
+import { useRouteEntrance, useStudioMotion } from './components/StudioMotion'
 import { MarkdownContent } from './components/MarkdownContent'
 import { PageMeta } from './components/PageMeta'
 import type { AdminIdentity, ContentItem, ContentType, ManagedContent } from './types'
 
 const Arrow = () => <span aria-hidden="true">↗</span>
 
-const botanicalImages = {
-  hero: '/images/botanical-hero-v1.webp',
-  peony: '/images/botanical-peony-v1.webp',
-  orchid: '/images/botanical-orchid-v1.webp',
-  project: '/images/botanical-project-v1.webp',
-  burgundy: '/images/botanical-burgundy-v1.webp',
-} as const
+const contentVisualLabels: Record<ContentType, string> = {
+  article: 'NOTE',
+  tool: 'AI',
+  podcast: 'PLAY',
+  project: 'BUILD',
+  resource: 'FILE',
+}
 
-function contentImage(item: ContentItem, index = 0) {
-  if (item.coverImage) return item.coverImage
-  if (item.type === 'project') return botanicalImages.project
-  const rotation = [botanicalImages.peony, botanicalImages.orchid, botanicalImages.burgundy]
-  return rotation[index % rotation.length]
+const studioNotes = [
+  '工具只有进入真实场景，才会变成自己的方法。',
+  '先留下过程，再慢慢整理出可以复用的答案。',
+  '好的分享不是信息更多，而是判断更清楚。',
+]
+
+function ContentVisual({ item, index = 0, compact = false }: { item: ContentItem; index?: number; compact?: boolean }) {
+  return (
+    <div className={`system-visual visual-${item.type} tone-${index % 4}${compact ? ' compact' : ''}`} aria-hidden="true">
+      <div className="system-visual-toolbar"><i /><i /><i /><span>{contentVisualLabels[item.type]}</span></div>
+      <div className="system-visual-grid">
+        <span /><span /><span /><span /><span /><span />
+      </div>
+      <div className="system-visual-chip">{item.category || contentVisualLabels[item.type]}</div>
+      <strong>{contentVisualLabels[item.type]}</strong>
+    </div>
+  )
+}
+
+function SystemCanvas({ compact = false }: { compact?: boolean }) {
+  return (
+    <div className={compact ? 'system-canvas compact' : 'system-canvas'} aria-hidden="true">
+      <div className="system-canvas-top"><span /><span /><span /><b>Help Myself / Workspace</b></div>
+      <div className="system-canvas-body">
+        <div className="system-canvas-rail"><i /><i /><i /><i /></div>
+        <div className="system-canvas-main">
+          <div className="system-canvas-heading"><span /><span /></div>
+          <div className="system-canvas-cards"><i /><i /><i /></div>
+          <div className="system-canvas-chart"><span /><span /><span /><span /><span /></div>
+        </div>
+      </div>
+      <div className="system-float-widget widget-cyan">AI notes</div>
+      <div className="system-float-widget widget-violet">Projects</div>
+      <div className="system-float-widget widget-lime">Resources</div>
+    </div>
+  )
 }
 
 const fallbackItems = fallbackContent.map(toManagedFallback)
@@ -176,7 +207,7 @@ function Layout({ children, immersive = false }: { children: React.ReactNode; im
   useRouteEntrance(scope, location.pathname, !isAdmin)
 
   return (
-    <div ref={scope} className={`${immersive ? 'app journal-shell immersive' : 'app journal-shell'}${isAdmin ? '' : ' botanical-shell'}`}>
+    <div ref={scope} className={`${immersive ? 'app journal-shell immersive' : 'app journal-shell'}${isAdmin ? '' : ' studio-shell'}`}>
       <SiteHeader />
       <main>{children}</main>
       <Footer />
@@ -188,7 +219,7 @@ function ContentCard({ item, large = false, index = 0 }: { item: ContentItem; la
   return (
     <Link to={`/content/${item.slug}`} className={large ? 'content-card large' : 'content-card'}>
       <div className="content-card-media">
-        <img src={contentImage(item, index)} alt="" loading="lazy" />
+        <ContentVisual item={item} index={index} />
         <span className="card-arrow"><Arrow /></span>
       </div>
       <div className="content-card-copy">
@@ -207,7 +238,8 @@ function ContentCard({ item, large = false, index = 0 }: { item: ContentItem; la
 function HomePage() {
   const { items } = useContent()
   const scope = useRef<HTMLDivElement>(null)
-  useBotanicalMotion(scope)
+  const [noteIndex, setNoteIndex] = useState(0)
+  useStudioMotion(scope)
   const catalog = withFallbackContent(items)
   const stories = catalog.filter((item) => item.type !== 'project' && item.type !== 'resource').slice(0, 5)
   const projects = catalog.filter((item) => item.type === 'project')
@@ -215,53 +247,45 @@ function HomePage() {
 
   return (
     <Layout>
-      <div ref={scope} className="botanical-home">
-        <section className="botanical-hero" aria-labelledby="hero-title">
-          <img data-hero-image className="botanical-hero-image" src={botanicalImages.hero} alt="深色背景中的兰花、火鹤花与野花组合" />
-          <div className="botanical-hero-shade" />
-          <div className="botanical-hero-copy">
-            <p data-hero-reveal className="botanical-kicker">Flora 的学习与创作花园</p>
+      <div ref={scope} className="studio-home">
+        <section className="studio-hero" aria-labelledby="hero-title">
+          <div className="studio-hero-copy">
+            <p data-hero-reveal className="studio-kicker">Help Myself / Flora 的个人博客</p>
             <h1 data-hero-reveal id="hero-title">
-              <span>Help myself,</span>
-              <em>help others.</em>
+              记录学习，<span className="inline-system-preview" aria-hidden="true"><i /><i /><i /></span><br />
+              <em>分享有用内容。</em>
             </h1>
-            <p data-hero-reveal className="botanical-intro">把 AI 学习、真实体验与项目过程种成一座可以慢慢探索的花园。</p>
-            <div data-hero-reveal className="botanical-actions">
-              <Link className="botanical-button primary" to="/articles">开始阅读</Link>
-              <Link className="botanical-button secondary" to="/projects">进入项目展厅</Link>
+            <p data-hero-reveal className="studio-intro">围绕 AI 工具、学习方法、播客思考和真实项目，建立一个清楚、可搜索、能持续更新的知识空间。</p>
+            <div data-hero-reveal className="studio-actions">
+              <Link className="studio-button primary" to="/articles">浏览最新文章</Link>
+              <Link className="studio-button secondary" to="/projects">查看项目</Link>
             </div>
           </div>
-          <div className="botanical-scroll-cue" aria-hidden="true"><span />继续探索</div>
+          <div className="studio-hero-visual" data-hero-canvas><SystemCanvas /></div>
         </section>
 
-        <div className="botanical-marquee" aria-label="网站内容范围">
-          <div>
-            {[...Array(2)].flatMap(() => ['AI 学习', '真实使用体感', '播客感悟', '效率方法', '项目复盘']).map((label, index) => (
-              <span key={`${label}-${index}`}>{label}<i /></span>
-            ))}
-          </div>
+        <div className="studio-topic-strip" aria-label="网站内容范围">
+          <span>AI 工具与体感</span><span>学习方法</span><span>播客思考</span><span>项目复盘</span><span>资源整理</span>
         </div>
 
-        <section className="botanical-section botanical-stories" aria-labelledby="stories-title">
-          <div className="botanical-section-heading" data-reveal>
+        <section className="studio-section studio-stories" aria-labelledby="stories-title">
+          <div className="studio-section-heading" data-reveal>
             <div>
-              <p>最近的记录</p>
-              <h2 id="stories-title">从真实问题里，<br />长出自己的答案。</h2>
+              <p>最近更新</p>
+              <h2 id="stories-title">把正在学习的事，<br />整理成可以再次使用的内容。</h2>
             </div>
             <Link to="/articles">查看全部内容 <Arrow /></Link>
           </div>
-          <div className="botanical-bento">
+          <div className="studio-bento">
             {stories.map((item, index) => (
               <Link
                 data-reveal
-                data-image-reveal
                 key={item.slug}
                 to={`/content/${item.slug}`}
-                className={`botanical-story-card story-${index + 1}`}
+                className={`studio-story-card story-${index + 1}`}
               >
-                <img src={contentImage(item, index)} alt="" loading={index < 2 ? 'eager' : 'lazy'} />
-                <div className="botanical-card-shade" />
-                <div className="botanical-card-copy">
+                <ContentVisual item={item} index={index} />
+                <div className="studio-card-copy">
                   <p>{item.category}</p>
                   <h3>{item.title}</h3>
                   <span>{item.date.replaceAll('-', '.')} · {item.readTime}</span>
@@ -271,31 +295,41 @@ function HomePage() {
           </div>
         </section>
 
-        <section className="botanical-manifesto" data-image-reveal>
-          <div className="botanical-manifesto-image"><img src={botanicalImages.burgundy} alt="酒红色大丽花与绿色叶材组成的花艺静物" loading="lazy" /></div>
-          <div className="botanical-manifesto-copy" data-reveal>
-            <p>我的内容原则</p>
-            <h2>不是把答案端给你，<br />而是把探索过程留给你。</h2>
-            <div className="botanical-principles">
-              <article><h3>从真实问题开始</h3><p>只记录我真正遇见、使用和思考过的事情。</p></article>
-              <article><h3>保留个人判断</h3><p>工具不只列功能，也会留下适合谁和为什么推荐。</p></article>
-              <article><h3>把过程做成作品</h3><p>每个项目都会沉淀目标、方法、结果与复盘。</p></article>
-            </div>
+        <section className="studio-notes" aria-labelledby="studio-notes-title" data-reveal>
+          <div>
+            <p>最近在想</p>
+            <h2 id="studio-notes-title">“{studioNotes[noteIndex]}”</h2>
+          </div>
+          <div className="studio-note-controls">
+            <span>{String(noteIndex + 1).padStart(2, '0')} / {String(studioNotes.length).padStart(2, '0')}</span>
+            <button type="button" aria-label="上一条" onClick={() => setNoteIndex((noteIndex - 1 + studioNotes.length) % studioNotes.length)}>←</button>
+            <button type="button" aria-label="下一条" onClick={() => setNoteIndex((noteIndex + 1) % studioNotes.length)}>→</button>
           </div>
         </section>
 
-        <section className="botanical-section botanical-project-preview" aria-labelledby="project-preview-title">
-          <div className="botanical-section-heading" data-reveal>
-            <div>
-              <p>正在生长的作品</p>
-              <h2 id="project-preview-title">项目不只展示结果，<br />也保存它怎样发生。</h2>
-            </div>
-            <Link to="/projects">查看项目展厅 <Arrow /></Link>
+        <section className="studio-pin-section">
+          <div className="studio-pin-title">
+            <p>内容原则</p>
+            <h2>不追求信息更多，<br />只追求判断更清楚。</h2>
           </div>
-          <Link className="botanical-project-feature" to={featuredProject ? `/content/${featuredProject.slug}` : '/projects'} data-reveal data-image-reveal>
-            <img src={featuredProject ? contentImage(featuredProject) : botanicalImages.project} alt="白色兰花与深色花材构成的项目主题静物" loading="lazy" />
-            <div className="botanical-card-shade" />
+          <div className="studio-principle-stack">
+            <article className="studio-stack-card tone-cyan"><span>从真实问题开始</span><h3>只记录真正遇见、使用和思考过的事情。</h3><p>内容来自实际学习过程，不复制工具说明书。</p></article>
+            <article className="studio-stack-card tone-violet"><span>保留个人判断</span><h3>不仅告诉你有什么，也说明适合谁和为什么。</h3><p>推荐指数、使用体感和限制都会被保留下来。</p></article>
+            <article className="studio-stack-card tone-lime"><span>把过程做成作品</span><h3>每个项目都沉淀目标、方法、结果与复盘。</h3><p>项目展厅不是终点陈列，而是完整的制作档案。</p></article>
+          </div>
+        </section>
+
+        <section className="studio-section studio-project-preview" aria-labelledby="project-preview-title">
+          <div className="studio-section-heading" data-reveal>
             <div>
+              <p>项目档案</p>
+              <h2 id="project-preview-title">不仅展示结果，<br />也保存它怎样完成。</h2>
+            </div>
+            <Link to="/projects">查看全部项目 <Arrow /></Link>
+          </div>
+          <Link className="studio-project-feature" to={featuredProject ? `/content/${featuredProject.slug}` : '/projects'} data-reveal>
+            <div className="studio-project-browser"><SystemCanvas compact /></div>
+            <div className="studio-project-copy">
               <p>{featuredProject?.category || 'Flora 的项目档案'}</p>
               <h3>{featuredProject?.title || '第一个项目正在整理中'}</h3>
               <span>{featuredProject?.summary || '以后从后台发布的项目，会自动出现在这里。'}</span>
@@ -303,12 +337,12 @@ function HomePage() {
           </Link>
         </section>
 
-        <section className="botanical-closing" data-reveal>
-          <p>继续走进这座花园</p>
-          <h2>下一篇记录，<br />也许正好能帮到你。</h2>
-          <div className="botanical-actions">
-            <Link className="botanical-button primary" to="/search">搜索你需要的内容</Link>
-            <Link className="botanical-button secondary" to="/about">认识 Flora</Link>
+        <section className="studio-closing" data-reveal>
+          <p>Help myself, help others.</p>
+          <h2>从一个具体问题开始，<br />找到你现在需要的内容。</h2>
+          <div className="studio-actions">
+            <Link className="studio-button primary" to="/search">搜索站内内容</Link>
+            <Link className="studio-button secondary" to="/about">认识 Flora</Link>
           </div>
         </section>
       </div>
@@ -389,41 +423,39 @@ function CollectionPage({ page }: { page: keyof typeof collectionConfig }) {
 function ProjectPage() {
   const { items } = useContent()
   const scope = useRef<HTMLDivElement>(null)
-  useBotanicalMotion(scope)
+  useStudioMotion(scope)
   const projects = withFallbackContent(items).filter((item) => item.type === 'project')
 
   return (
     <Layout>
       <div ref={scope} className="project-showcase">
         <section className="project-showcase-hero">
-          <img data-hero-image src={botanicalImages.project} alt="白色兰花、黑色郁金香与尤加利叶构成的花艺静物" />
-          <div className="project-showcase-shade" />
           <div>
             <p data-hero-reveal>Flora 的项目档案</p>
-            <h1 data-hero-reveal>Ideas become<br /><em>something real.</em></h1>
+            <h1 data-hero-reveal>把想法，<br /><em>做成真正能用的东西。</em></h1>
             <span data-hero-reveal>这里保存产品、网站与实验项目的目标、过程、结果和复盘。</span>
           </div>
+          <div className="project-showcase-canvas" data-hero-canvas><SystemCanvas /></div>
         </section>
 
-        <section className="botanical-section project-archive" aria-labelledby="project-archive-title">
-          <div className="botanical-section-heading" data-reveal>
+        <section className="studio-section project-archive" aria-labelledby="project-archive-title">
+          <div className="studio-section-heading" data-reveal>
             <div>
               <p>项目展厅</p>
-              <h2 id="project-archive-title">每一次动手，<br />都是一次能力的生长。</h2>
+              <h2 id="project-archive-title">每一次动手，<br />都留下完整的制作档案。</h2>
             </div>
             <Link to="/about">了解我的创作方式 <Arrow /></Link>
           </div>
 
           {projects.length > 0 ? (
-            <div className="botanical-project-accordion">
+            <div className="studio-project-accordion">
               {projects.map((project, index) => (
                 <Link
                   key={project.slug}
                   to={`/content/${project.slug}`}
-                  className="botanical-project-card"
-                  style={{ backgroundImage: `url(${contentImage(project, index)})` }}
+                  className={`studio-project-card tone-${index % 4}`}
                 >
-                  <div className="botanical-card-shade" />
+                  <ContentVisual item={project} index={index} compact />
                   <div>
                     <p>{project.category}</p>
                     <h3>{project.title}</h3>
@@ -435,8 +467,8 @@ function ProjectPage() {
             </div>
           ) : (
             <div className="project-empty" data-reveal>
-              <img src={botanicalImages.orchid} alt="深色背景中的紫色兰花" />
-              <div><h2>第一个项目正在发芽。</h2><p>在后台把内容类型选择为“项目作品”并发布，它就会自动进入这个展厅。</p></div>
+              <ContentVisual item={{ ...fallbackContent[0], type: 'project', category: '项目档案' }} />
+              <div><h2>第一个项目正在整理。</h2><p>在后台把内容类型选择为“项目作品”并发布，它就会自动进入这个展厅。</p></div>
             </div>
           )}
         </section>
@@ -470,7 +502,7 @@ function AboutPage() {
   return (
     <Layout>
       <section className="about-hero">
-        <div className="about-image" role="img" aria-label="酒红色花材与绿色叶片组成的暗色花艺静物" />
+        <div className="about-image" role="img" aria-label="Help Myself 知识工作台示意图"><SystemCanvas compact /></div>
         <div className="about-copy">
           <p className="eyebrow">About Flora</p>
           <h1>Help myself,<br />help others.</h1>
@@ -499,8 +531,7 @@ function DetailPage() {
       <article className="article-page">
         {item.type === 'project' && (
           <div className="project-detail-cover">
-            <img src={contentImage(item)} alt="" />
-            <div className="botanical-card-shade" />
+            <ContentVisual item={item} />
           </div>
         )}
         <header className="article-header">
@@ -846,7 +877,7 @@ function AdminPage() {
                             markdown: event.target.value,
                             body: event.target.value.split(/\n{2,}/).map((paragraph) => paragraph.trim()).filter(Boolean),
                           })}
-                          placeholder={'# 一级标题\n\n正文支持 **粗体**、列表、引用、代码和表格。\n\nhttps://www.bilibili.com/video/BV...'}
+                          placeholder={'# 一级标题\n\n正文支持 **粗体**、列表、引用、代码和表格。\n\n粘贴 B站或 YouTube 视频链接，即可在文章中直接播放。'}
                         />
                         <details className="markdown-help">
                           <summary>Markdown 写作提示</summary>
@@ -890,7 +921,7 @@ function NotFoundPage() {
     <Layout>
       <section className="not-found">
         <span>404</span>
-        <h1>这座花园里，还没有这条小径。</h1>
+        <h1>这个页面，还没有被整理进系统。</h1>
         <p>你访问的页面不存在，或者已经被 Flora 移走了。</p>
         <Link className="primary-button" to="/">回到首页</Link>
       </section>

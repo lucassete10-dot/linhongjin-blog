@@ -30,13 +30,6 @@ function loadImage(source: string) {
   })
 }
 
-function drawCoverImage(context: CanvasRenderingContext2D, image: HTMLImageElement, width: number, height: number) {
-  const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight)
-  const renderedWidth = image.naturalWidth * scale
-  const renderedHeight = image.naturalHeight * scale
-  context.drawImage(image, (width - renderedWidth) / 2, (height - renderedHeight) / 2, renderedWidth, renderedHeight)
-}
-
 function wrapText(context: CanvasRenderingContext2D, text: string, maxWidth: number, maxLines: number) {
   const lines: string[] = []
   let line = ''
@@ -68,79 +61,98 @@ async function createPoster(item: ContentItem, url: string) {
   const context = canvas.getContext('2d')
   if (!context) throw new Error('当前浏览器无法生成海报。')
 
-  const backgroundSource = item.coverImage || `${window.location.origin}/images/botanical-hero-v1.webp`
-  let background: HTMLImageElement
-  try {
-    background = await loadImage(backgroundSource)
-  } catch {
-    background = await loadImage(`${window.location.origin}/images/botanical-hero-v1.webp`)
+  context.fillStyle = '#f3f5f4'
+  context.fillRect(0, 0, width, height)
+  context.strokeStyle = '#d8dcda'
+  context.lineWidth = 1
+  for (let x = 72; x < width; x += 96) {
+    context.beginPath()
+    context.moveTo(x, 0)
+    context.lineTo(x, height)
+    context.stroke()
+  }
+  for (let y = 72; y < height; y += 96) {
+    context.beginPath()
+    context.moveTo(0, y)
+    context.lineTo(width, y)
+    context.stroke()
   }
 
-  drawCoverImage(context, background, width, height)
+  const modules = [
+    { x: 72, y: 72, width: 250, height: 118, color: '#36d7e5' },
+    { x: 846, y: 118, width: 162, height: 162, color: '#8577f7' },
+    { x: 72, y: 1204, width: 178, height: 164, color: '#ff6293' },
+    { x: 824, y: 1260, width: 184, height: 108, color: '#7ee63f' },
+  ]
+  modules.forEach((module) => {
+    context.fillStyle = module.color
+    context.beginPath()
+    context.roundRect(module.x, module.y, module.width, module.height, 26)
+    context.fill()
+  })
 
-  const wash = context.createLinearGradient(0, 0, 0, height)
-  wash.addColorStop(0, 'rgba(4, 7, 5, 0.14)')
-  wash.addColorStop(0.38, 'rgba(5, 8, 6, 0.64)')
-  wash.addColorStop(1, 'rgba(5, 8, 6, 0.98)')
-  context.fillStyle = wash
-  context.fillRect(0, 0, width, height)
-
-  context.fillStyle = 'rgba(12, 17, 13, 0.9)'
+  context.shadowColor = 'rgba(8, 11, 11, 0.12)'
+  context.shadowBlur = 48
+  context.shadowOffsetY = 18
+  context.fillStyle = '#ffffff'
   context.beginPath()
-  context.roundRect(72, 470, 936, 880, 42)
+  context.roundRect(72, 250, 936, 940, 42)
   context.fill()
+  context.shadowColor = 'transparent'
 
-  context.fillStyle = '#d9e68d'
-  context.beginPath()
-  context.arc(128, 552, 31, 0, Math.PI * 2)
-  context.fill()
-  context.fillStyle = '#0b0e0a'
-  context.font = '700 25px "Outfit", sans-serif'
+  context.fillStyle = '#080b0b'
+  context.fillRect(112, 304, 62, 62)
+  context.fillStyle = '#36d7e5'
+  context.fillRect(133, 325, 20, 20)
+  context.fillStyle = '#ffffff'
+  context.font = '720 21px "Geist", sans-serif'
   context.textAlign = 'center'
-  context.fillText('F', 128, 562)
+  context.fillText('HM', 143, 346)
 
   context.textAlign = 'left'
-  context.fillStyle = '#f4f1e8'
-  context.font = '650 32px "Outfit", "Noto Sans SC", sans-serif'
-  context.fillText('Help Myself', 180, 563)
-  context.fillStyle = '#a7ada4'
-  context.font = '500 23px "Outfit", "Noto Sans SC", sans-serif'
-  context.fillText('Help myself, help others.', 180, 602)
+  context.fillStyle = '#080b0b'
+  context.font = '720 32px "Geist", "Noto Sans SC", sans-serif'
+  context.fillText('Help Myself', 198, 333)
+  context.fillStyle = '#586160'
+  context.font = '500 22px "Geist", "Noto Sans SC", sans-serif'
+  context.fillText('Help myself, help others.', 198, 365)
 
-  context.fillStyle = '#d9e68d'
-  context.font = '650 24px "Outfit", "Noto Sans SC", sans-serif'
-  context.fillText(item.category || 'Flora 的学习记录', 112, 686)
+  context.fillStyle = '#080b0b'
+  context.font = '650 23px "Geist", "Noto Sans SC", sans-serif'
+  context.fillText(item.category || 'Flora 的学习记录', 112, 458)
 
-  context.fillStyle = '#f4f1e8'
-  context.font = '650 64px "Outfit", "Noto Sans SC", sans-serif'
+  context.fillStyle = '#080b0b'
+  context.font = '720 66px "Geist", "Noto Sans SC", sans-serif'
   const titleLines = wrapText(context, item.title, 820, 3)
-  titleLines.forEach((line, index) => context.fillText(line, 112, 780 + index * 86))
+  titleLines.forEach((line, index) => context.fillText(line, 112, 555 + index * 84))
 
-  context.fillStyle = '#b9beb5'
-  context.font = '400 28px "Outfit", "Noto Sans SC", sans-serif'
+  context.fillStyle = '#586160'
+  context.font = '430 28px "Geist", "Noto Sans SC", sans-serif'
   const summaryLines = wrapText(context, item.summary, 820, 3)
-  const summaryTop = 820 + titleLines.length * 86
+  const summaryTop = 598 + titleLines.length * 84
   summaryLines.forEach((line, index) => context.fillText(line, 112, summaryTop + index * 46))
 
   const { toDataURL } = await import('qrcode')
   const qrCode = await loadImage(await toDataURL(url, {
     width: 210,
     margin: 1,
-    color: { dark: '#0b0e0a', light: '#f4f1e8' },
+    color: { dark: '#080b0b', light: '#ffffff' },
   }))
-  context.fillStyle = '#f4f1e8'
+  context.fillStyle = '#ffffff'
   context.beginPath()
-  context.roundRect(112, 1080, 238, 238, 24)
+  context.roundRect(112, 902, 238, 238, 24)
   context.fill()
-  context.drawImage(qrCode, 126, 1094, 210, 210)
+  context.strokeStyle = '#d8dcda'
+  context.stroke()
+  context.drawImage(qrCode, 126, 916, 210, 210)
 
-  context.fillStyle = '#f4f1e8'
-  context.font = '650 27px "Outfit", "Noto Sans SC", sans-serif'
-  context.fillText('扫码阅读全文', 390, 1160)
-  context.fillStyle = '#a7ada4'
-  context.font = '400 22px "Outfit", "Noto Sans SC", sans-serif'
-  context.fillText(`${item.date}  ·  ${item.readTime}`, 390, 1206)
-  context.fillText('linhongjin.top', 390, 1255)
+  context.fillStyle = '#080b0b'
+  context.font = '650 27px "Geist", "Noto Sans SC", sans-serif'
+  context.fillText('扫码阅读全文', 390, 980)
+  context.fillStyle = '#586160'
+  context.font = '430 22px "Geist", "Noto Sans SC", sans-serif'
+  context.fillText(`${item.date}  ·  ${item.readTime}`, 390, 1028)
+  context.fillText('linhongjin.top', 390, 1074)
 
   return canvas.toDataURL('image/png')
 }

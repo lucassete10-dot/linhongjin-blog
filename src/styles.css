@@ -2613,7 +2613,7 @@ select {
   min-height: 0;
   margin-left: 184px;
   background-color: #eaf4fa;
-  background-image: url('/images/flora-winter-clean-v2.webp');
+  background-image: none;
   background-position: center center;
   background-size: cover;
 }
