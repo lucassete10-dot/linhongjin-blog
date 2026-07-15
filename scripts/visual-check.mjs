@@ -29,17 +29,17 @@ try {
     documentHeight: document.documentElement.scrollHeight,
     viewportHeight: window.innerHeight,
   }))
-  await desktop.locator('.botanical-stories').scrollIntoViewIfNeeded()
+  await desktop.locator('.studio-stories').scrollIntoViewIfNeeded()
   await desktop.waitForTimeout(700)
   await desktop.screenshot({ path: join(outputDirectory, 'home-stories-desktop.png') })
-  await desktop.locator('.botanical-project-preview').scrollIntoViewIfNeeded()
+  await desktop.locator('.studio-project-preview').scrollIntoViewIfNeeded()
   await desktop.waitForTimeout(700)
   await desktop.screenshot({ path: join(outputDirectory, 'home-project-desktop.png') })
 
   await desktop.goto(`${baseUrl}/#/projects`, { waitUntil: 'domcontentloaded' })
   await desktop.waitForTimeout(700)
   await desktop.screenshot({ path: join(outputDirectory, 'projects-desktop.png') })
-  const projectCardCount = await desktop.locator('.botanical-project-card').count()
+  const projectCardCount = await desktop.locator('.studio-project-card').count()
 
   await desktop.goto(`${baseUrl}/#/tools`, { waitUntil: 'domcontentloaded' })
   await desktop.waitForTimeout(700)
