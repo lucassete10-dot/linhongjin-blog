@@ -43,6 +43,15 @@ const studioNotes = [
 ]
 
 function ContentVisual({ item, index = 0, compact = false }: { item: ContentItem; index?: number; compact?: boolean }) {
+  if (item.coverImage) {
+    return (
+      <div className={`system-cover-visual tone-${index % 4}${compact ? ' compact' : ''}`} aria-hidden="true">
+        <img src={item.coverImage} alt="" loading="lazy" />
+        <span>{item.category || contentVisualLabels[item.type]}</span>
+      </div>
+    )
+  }
+
   return (
     <div className={`system-visual visual-${item.type} tone-${index % 4}${compact ? ' compact' : ''}`} aria-hidden="true">
       <div className="system-visual-toolbar"><i /><i /><i /><span>{contentVisualLabels[item.type]}</span></div>
@@ -85,7 +94,7 @@ function ContentProvider({ children }: { children: React.ReactNode }) {
 
   const refresh = async () => {
     try {
-      setItems(await fetchPublishedContent())
+      setItems(withFallbackContent(await fetchPublishedContent()))
     } catch {
       setItems(fallbackItems)
     }
@@ -95,7 +104,7 @@ function ContentProvider({ children }: { children: React.ReactNode }) {
     let active = true
     fetchPublishedContent()
       .then((nextItems) => {
-        if (active) setItems(nextItems)
+        if (active) setItems(withFallbackContent(nextItems))
       })
       .catch(() => {
         if (active) setItems(fallbackItems)
@@ -115,6 +124,7 @@ function useContent() {
 function withFallbackContent(items: ManagedContent[]) {
   const seen = new Set(items.map((item) => item.slug))
   return [...items, ...fallbackItems.filter((item) => !seen.has(item.slug))]
+    .sort((first, second) => Number(second.pinned) - Number(first.pinned) || second.date.localeCompare(first.date))
 }
 
 function ScrollToTop() {
@@ -533,6 +543,11 @@ function DetailPage() {
           <div className="project-detail-cover">
             <ContentVisual item={item} />
           </div>
+        )}
+        {item.type !== 'project' && item.coverImage && (
+          <figure className="article-feature-image">
+            <img src={item.coverImage} alt={`${item.title}封面`} />
+          </figure>
         )}
         <header className="article-header">
           <Link to={`/${item.type === 'article' ? 'articles' : item.type === 'tool' ? 'tools' : item.type === 'podcast' ? 'podcasts' : 'projects'}`} className="back-link">← 返回{contentTypeLabels[item.type]}</Link>
