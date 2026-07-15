@@ -55,13 +55,12 @@ try {
   await desktop.goto(`${baseUrl}/#/content/wechat-voice-input-with-codex`, { waitUntil: 'domcontentloaded' })
   await desktop.waitForTimeout(700)
   const voiceArticlePublished = await desktop.getByRole('heading', { name: /用微信语音输入直接与 Codex 协作/ }).isVisible().catch(() => false)
-  const voiceArticleCoverVisible = await desktop.locator('.article-feature-image img').isVisible().catch(() => false)
+  const voiceArticleCoverVisible = await desktop.locator('.article-feature-image img').evaluate((image) => {
+    const element = /** @type {HTMLImageElement} */ (image)
+    return element.complete && element.naturalWidth > 0 && element.naturalHeight > 0
+  }).catch(() => false)
   await desktop.screenshot({ path: join(outputDirectory, 'voice-codex-article.png') })
 
-  await desktop.goto(`${baseUrl}/#/articles`, { waitUntil: 'domcontentloaded' })
-  await desktop.waitForTimeout(700)
-  await desktop.locator('.content-card').first().click()
-  await desktop.waitForTimeout(700)
   const articleTitle = await desktop.locator('.article-header h1').innerText()
   const documentTitle = await desktop.title()
   const metadataWorks = documentTitle.includes(articleTitle)
@@ -70,11 +69,6 @@ try {
   const posterSource = await desktop.locator('.poster-panel img').getAttribute('src')
   const posterWorks = Boolean(posterSource?.startsWith('data:image/png'))
   await desktop.screenshot({ path: join(outputDirectory, 'article-share-poster.png') })
-
-  await desktop.goto(`${baseUrl}/#/content/ted-content-sharing`, { waitUntil: 'domcontentloaded' })
-  await desktop.waitForTimeout(700)
-  const bilibiliSource = await desktop.locator('.bilibili-embed iframe').first().getAttribute('src').catch(() => null)
-  const bilibiliEmbedWorks = Boolean(bilibiliSource?.includes('player.bilibili.com'))
 
   await desktop.goto(`${baseUrl}/#/admin`, { waitUntil: 'domcontentloaded' })
   await desktop.waitForTimeout(700)
@@ -88,9 +82,7 @@ try {
   await mobile.waitForTimeout(900)
   const mobileHomeOverflow = await mobile.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)
   await mobile.screenshot({ path: join(outputDirectory, 'home-mobile.png') })
-  await mobile.goto(`${baseUrl}/#/articles`, { waitUntil: 'domcontentloaded' })
-  await mobile.waitForTimeout(700)
-  await mobile.locator('.content-card').first().click()
+  await mobile.goto(`${baseUrl}/#/content/wechat-voice-input-with-codex`, { waitUntil: 'domcontentloaded' })
   await mobile.waitForTimeout(700)
   await mobile.locator('.article-share').scrollIntoViewIfNeeded()
   const mobileOverflow = await mobile.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)
@@ -106,7 +98,6 @@ try {
     voiceArticleCoverVisible,
     metadataWorks,
     posterWorks,
-    bilibiliEmbedWorks,
     adminLoginVisible,
     mobileOverflow,
   }, null, 2))

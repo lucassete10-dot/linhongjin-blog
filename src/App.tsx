@@ -21,6 +21,7 @@ import {
 } from './api'
 import { content as fallbackContent, contentTypeLabels, navItems } from './data'
 import { ArticleShare } from './components/ArticleShare'
+import { BrandMark } from './components/BrandMark'
 import { useRouteEntrance, useStudioMotion } from './components/StudioMotion'
 import { MarkdownContent } from './components/MarkdownContent'
 import { PageMeta } from './components/PageMeta'
@@ -159,7 +160,7 @@ function SiteHeader() {
   return (
     <header className="site-header">
       <Link className="brand" to="/" aria-label="Help Myself 首页" onClick={() => setOpen(false)}>
-        <span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>
+        <BrandMark />
         <span>Help Myself</span>
       </Link>
       <button
@@ -216,10 +217,10 @@ function Layout({ children, immersive = false }: { children: React.ReactNode; im
   useRouteEntrance(scope, location.pathname, !isAdmin)
 
   return (
-    <div ref={scope} className={`${immersive ? 'app journal-shell immersive' : 'app journal-shell'}${isAdmin ? '' : ' studio-shell'}`}>
-      <SiteHeader />
+    <div ref={scope} className={`${immersive ? 'app journal-shell immersive' : 'app journal-shell'}${isAdmin ? ' admin-shell' : ' studio-shell'}`}>
+      {!isAdmin && <SiteHeader />}
       <main>{children}</main>
-      <Footer />
+      {!isAdmin && <Footer />}
     </div>
   )
 }
@@ -783,7 +784,7 @@ function AdminPage() {
   }
 
   if (checkingSession) {
-    return <Layout><section className="admin-page"><div className="login-card"><span className="login-star">✦</span><p>正在检查登录状态……</p></div></section></Layout>
+    return <Layout><section className="admin-page"><div className="login-card"><BrandMark /><p>正在检查登录状态……</p></div></section></Layout>
   }
 
   if (!admin) {
@@ -791,8 +792,8 @@ function AdminPage() {
       <Layout>
         <section className="admin-page">
           <form className="login-card" onSubmit={submitLogin}>
-            <span className="login-star">✦</span>
-            <p className="eyebrow">Flora only</p>
+            <BrandMark />
+            <p className="eyebrow">仅限 Flora</p>
             <h1>管理后台</h1>
             <p>使用 Supabase 中创建的管理员邮箱和密码登录。</p>
             <label className="login-field"><span>管理员邮箱</span><input type="email" value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="username" required /></label>
@@ -815,7 +816,7 @@ function AdminPage() {
       <section className="admin-page">
         <div className="dashboard">
           <aside>
-            <Link className="brand" to="/"><span className="brand-star">✦</span> Help Myself</Link>
+            <Link className="brand" to="/"><BrandMark /><span>Help Myself</span></Link>
             <nav>
               <button className={!draft ? 'active' : ''} onClick={() => setDraft(null)}>内容管理</button>
               <button onClick={beginCreate}>新建内容</button>
@@ -827,8 +828,8 @@ function AdminPage() {
             {!draft ? (
               <>
                 <header>
-                  <div><p className="eyebrow">Dashboard</p><h1>你好，{admin.username}</h1></div>
-                  <button className="primary-button" onClick={beginCreate}>＋ 新建内容</button>
+                  <div><p className="eyebrow">内容工作台</p><h1>你好，{admin.username}</h1></div>
+                  <button className="primary-button" onClick={beginCreate}>新建内容</button>
                 </header>
                 <div className="stats-grid">
                   {[['草稿', draftCount], ['已发布', publishedCount], ['置顶内容', pinnedCount]].map(([label, value]) => (
