@@ -5,7 +5,7 @@ import type { ManagedContent } from '../types'
 const SITE_NAME = 'Help Myself'
 const DEFAULT_TITLE = 'Help Myself — Flora 的 AI 学习与探索空间'
 const DEFAULT_DESCRIPTION = 'Flora 的 AI 学习与探索空间。Help myself, help others.'
-const DEFAULT_IMAGE = '/images/flora-winter-clean-v2.webp'
+const DEFAULT_IMAGE = '/images/botanical-hero-v1.webp'
 
 const routeMeta: Record<string, { title: string; description: string }> = {
   '/': { title: DEFAULT_TITLE, description: DEFAULT_DESCRIPTION },
@@ -77,7 +77,7 @@ export function PageMeta({ items }: { items: ManagedContent[] }) {
     }
     script.text = JSON.stringify(item ? {
       '@context': 'https://schema.org',
-      '@type': 'Article',
+      '@type': item.type === 'project' ? 'CreativeWork' : 'Article',
       headline: item.title,
       description: item.summary,
       image,

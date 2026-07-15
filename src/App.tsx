@@ -1,11 +1,10 @@
-import { FormEvent, createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { FormEvent, createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Link,
   NavLink,
   Route,
   Routes,
   useLocation,
-  useNavigate,
   useParams,
   useSearchParams,
 } from 'react-router-dom'
@@ -22,11 +21,27 @@ import {
 } from './api'
 import { content as fallbackContent, contentTypeLabels, navItems } from './data'
 import { ArticleShare } from './components/ArticleShare'
+import { useBotanicalMotion, useRouteEntrance } from './components/BotanicalMotion'
 import { MarkdownContent } from './components/MarkdownContent'
 import { PageMeta } from './components/PageMeta'
 import type { AdminIdentity, ContentItem, ContentType, ManagedContent } from './types'
 
 const Arrow = () => <span aria-hidden="true">↗</span>
+
+const botanicalImages = {
+  hero: '/images/botanical-hero-v1.webp',
+  peony: '/images/botanical-peony-v1.webp',
+  orchid: '/images/botanical-orchid-v1.webp',
+  project: '/images/botanical-project-v1.webp',
+  burgundy: '/images/botanical-burgundy-v1.webp',
+} as const
+
+function contentImage(item: ContentItem, index = 0) {
+  if (item.coverImage) return item.coverImage
+  if (item.type === 'project') return botanicalImages.project
+  const rotation = [botanicalImages.peony, botanicalImages.orchid, botanicalImages.burgundy]
+  return rotation[index % rotation.length]
+}
 
 const fallbackItems = fallbackContent.map(toManagedFallback)
 const ContentContext = createContext<{ items: ManagedContent[]; refresh: () => Promise<void> }>({
@@ -66,6 +81,11 @@ function useContent() {
   return useContext(ContentContext)
 }
 
+function withFallbackContent(items: ManagedContent[]) {
+  const seen = new Set(items.map((item) => item.slug))
+  return [...items, ...fallbackItems.filter((item) => !seen.has(item.slug))]
+}
+
 function ScrollToTop() {
   const { pathname, hash } = useLocation()
 
@@ -99,7 +119,7 @@ function SiteHeader() {
   return (
     <header className="site-header">
       <Link className="brand" to="/" aria-label="Help Myself 首页" onClick={() => setOpen(false)}>
-        <span className="brand-star">✦</span>
+        <span className="brand-mark" aria-hidden="true"><i /><i /><i /></span>
         <span>Help Myself</span>
       </Link>
       <button
@@ -109,7 +129,7 @@ function SiteHeader() {
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
       >
-        <span aria-hidden="true">{open ? '×' : '☰'}</span>
+        <span className={open ? 'menu-lines is-open' : 'menu-lines'} aria-hidden="true"><i /><i /></span>
       </button>
       <nav className={open ? 'site-nav is-open' : 'site-nav'} aria-label="主导航">
         {navItems.map((item) => (
@@ -136,22 +156,27 @@ function Footer() {
   return (
     <footer className="footer">
       <div>
-        <p className="footer-brand">Help Myself <span>✦</span></p>
-        <p>Help myself, help others.</p>
+        <p className="footer-brand">Help Myself</p>
+        <p>把真实使用过的经验，整理成可以帮助别人的内容。</p>
       </div>
       <div className="footer-links">
+        <Link to="/projects">项目展厅</Link>
         <Link to="/about">关于 Flora</Link>
-        <Link to="/resources">资源库</Link>
         <Link to="/admin">管理后台</Link>
       </div>
-      <p className="copyright">© 2026 Flora</p>
+      <p className="copyright">Flora · 2026</p>
     </footer>
   )
 }
 
 function Layout({ children, immersive = false }: { children: React.ReactNode; immersive?: boolean }) {
+  const location = useLocation()
+  const scope = useRef<HTMLDivElement>(null)
+  const isAdmin = location.pathname.startsWith('/admin')
+  useRouteEntrance(scope, location.pathname, !isAdmin)
+
   return (
-    <div className={immersive ? 'app journal-shell immersive' : 'app journal-shell'}>
+    <div ref={scope} className={`${immersive ? 'app journal-shell immersive' : 'app journal-shell'}${isAdmin ? '' : ' botanical-shell'}`}>
       <SiteHeader />
       <main>{children}</main>
       <Footer />
@@ -159,45 +184,21 @@ function Layout({ children, immersive = false }: { children: React.ReactNode; im
   )
 }
 
-function SearchBox({ compact = false }: { compact?: boolean }) {
-  const navigate = useNavigate()
-  const [value, setValue] = useState('')
-
-  const submit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const query = value.trim()
-    navigate(query ? `/search?q=${encodeURIComponent(query)}` : '/search')
-  }
-
-  return (
-    <form className={compact ? 'search-box compact' : 'search-box'} onSubmit={submit}>
-      <span aria-hidden="true">⌕</span>
-      <input
-        value={value}
-        onChange={(event) => setValue(event.target.value)}
-        placeholder="搜索文章、AI 工具、播客和项目……"
-        aria-label="搜索站内内容"
-      />
-      <button type="submit">搜索</button>
-    </form>
-  )
-}
-
-function ContentCard({ item, large = false }: { item: ContentItem; large?: boolean }) {
+function ContentCard({ item, large = false, index = 0 }: { item: ContentItem; large?: boolean; index?: number }) {
   return (
     <Link to={`/content/${item.slug}`} className={large ? 'content-card large' : 'content-card'}>
-      <div className="card-topline">
-        <span>{item.eyebrow}</span>
+      <div className="content-card-media">
+        <img src={contentImage(item, index)} alt="" loading="lazy" />
         <span className="card-arrow"><Arrow /></span>
       </div>
-      <div>
+      <div className="content-card-copy">
         <p className="card-category">{item.category}</p>
         <h3>{item.title}</h3>
         <p className="card-summary">{item.summary}</p>
-      </div>
-      <div className="card-meta">
-        <span>{item.date}</span>
-        <span>{item.readTime}</span>
+        <div className="card-meta">
+          <span>{item.date}</span>
+          <span>{item.readTime}</span>
+        </div>
       </div>
     </Link>
   )
@@ -205,46 +206,112 @@ function ContentCard({ item, large = false }: { item: ContentItem; large?: boole
 
 function HomePage() {
   const { items } = useContent()
-  const allArticles = items.filter((item) => item.type === 'article')
-  const featuredArticle = allArticles[0]
-  const recentArticles = allArticles.slice(1, 4)
+  const scope = useRef<HTMLDivElement>(null)
+  useBotanicalMotion(scope)
+  const catalog = withFallbackContent(items)
+  const stories = catalog.filter((item) => item.type !== 'project' && item.type !== 'resource').slice(0, 5)
+  const projects = catalog.filter((item) => item.type === 'project')
+  const featuredProject = projects[0]
 
   return (
-    <Layout immersive>
-      <section className="hero journal-hero" aria-labelledby="hero-title">
-        <div className="hero-overlay" />
-        <div className="journal-stage">
-          <div className="journal-topline">
-            <div>
-              <p className="hero-kicker"><span>✦</span> Flora's field notes</p>
-              <p>Help myself, help others.</p>
+    <Layout>
+      <div ref={scope} className="botanical-home">
+        <section className="botanical-hero" aria-labelledby="hero-title">
+          <img data-hero-image className="botanical-hero-image" src={botanicalImages.hero} alt="深色背景中的兰花、火鹤花与野花组合" />
+          <div className="botanical-hero-shade" />
+          <div className="botanical-hero-copy">
+            <p data-hero-reveal className="botanical-kicker">Flora 的学习与创作花园</p>
+            <h1 data-hero-reveal id="hero-title">
+              <span>Help myself,</span>
+              <em>help others.</em>
+            </h1>
+            <p data-hero-reveal className="botanical-intro">把 AI 学习、真实体验与项目过程种成一座可以慢慢探索的花园。</p>
+            <div data-hero-reveal className="botanical-actions">
+              <Link className="botanical-button primary" to="/articles">开始阅读</Link>
+              <Link className="botanical-button secondary" to="/projects">进入项目展厅</Link>
             </div>
-            <SearchBox compact />
           </div>
+          <div className="botanical-scroll-cue" aria-hidden="true"><span />继续探索</div>
+        </section>
 
-          {featuredArticle && (
-            <article className="journal-feature">
-              <p className="journal-date">{featuredArticle.date.replaceAll('-', '.')} · FLORA</p>
-              <p className="journal-label">推荐阅读</p>
-              <h1 id="hero-title">{featuredArticle.title}</h1>
-              <p className="journal-summary">{featuredArticle.summary}</p>
-              <Link className="journal-read-button" to={`/content/${featuredArticle.slug}`}>阅读全文 <Arrow /></Link>
-            </article>
-          )}
-
-          <section className="journal-recent" aria-label="往期文章">
-            <div className="journal-section-title"><span>往期文章</span><i /></div>
-            <div className="journal-article-list">
-              {recentArticles.map((item) => (
-                <Link to={`/content/${item.slug}`} key={item.slug}>
-                  <strong>{item.title}</strong>
-                  <span>{item.date.replaceAll('-', '.')}</span>
-                </Link>
-              ))}
-            </div>
-          </section>
+        <div className="botanical-marquee" aria-label="网站内容范围">
+          <div>
+            {[...Array(2)].flatMap(() => ['AI 学习', '真实使用体感', '播客感悟', '效率方法', '项目复盘']).map((label, index) => (
+              <span key={`${label}-${index}`}>{label}<i /></span>
+            ))}
+          </div>
         </div>
-      </section>
+
+        <section className="botanical-section botanical-stories" aria-labelledby="stories-title">
+          <div className="botanical-section-heading" data-reveal>
+            <div>
+              <p>最近的记录</p>
+              <h2 id="stories-title">从真实问题里，<br />长出自己的答案。</h2>
+            </div>
+            <Link to="/articles">查看全部内容 <Arrow /></Link>
+          </div>
+          <div className="botanical-bento">
+            {stories.map((item, index) => (
+              <Link
+                data-reveal
+                data-image-reveal
+                key={item.slug}
+                to={`/content/${item.slug}`}
+                className={`botanical-story-card story-${index + 1}`}
+              >
+                <img src={contentImage(item, index)} alt="" loading={index < 2 ? 'eager' : 'lazy'} />
+                <div className="botanical-card-shade" />
+                <div className="botanical-card-copy">
+                  <p>{item.category}</p>
+                  <h3>{item.title}</h3>
+                  <span>{item.date.replaceAll('-', '.')} · {item.readTime}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="botanical-manifesto" data-image-reveal>
+          <div className="botanical-manifesto-image"><img src={botanicalImages.burgundy} alt="酒红色大丽花与绿色叶材组成的花艺静物" loading="lazy" /></div>
+          <div className="botanical-manifesto-copy" data-reveal>
+            <p>我的内容原则</p>
+            <h2>不是把答案端给你，<br />而是把探索过程留给你。</h2>
+            <div className="botanical-principles">
+              <article><h3>从真实问题开始</h3><p>只记录我真正遇见、使用和思考过的事情。</p></article>
+              <article><h3>保留个人判断</h3><p>工具不只列功能，也会留下适合谁和为什么推荐。</p></article>
+              <article><h3>把过程做成作品</h3><p>每个项目都会沉淀目标、方法、结果与复盘。</p></article>
+            </div>
+          </div>
+        </section>
+
+        <section className="botanical-section botanical-project-preview" aria-labelledby="project-preview-title">
+          <div className="botanical-section-heading" data-reveal>
+            <div>
+              <p>正在生长的作品</p>
+              <h2 id="project-preview-title">项目不只展示结果，<br />也保存它怎样发生。</h2>
+            </div>
+            <Link to="/projects">查看项目展厅 <Arrow /></Link>
+          </div>
+          <Link className="botanical-project-feature" to={featuredProject ? `/content/${featuredProject.slug}` : '/projects'} data-reveal data-image-reveal>
+            <img src={featuredProject ? contentImage(featuredProject) : botanicalImages.project} alt="白色兰花与深色花材构成的项目主题静物" loading="lazy" />
+            <div className="botanical-card-shade" />
+            <div>
+              <p>{featuredProject?.category || 'Flora 的项目档案'}</p>
+              <h3>{featuredProject?.title || '第一个项目正在整理中'}</h3>
+              <span>{featuredProject?.summary || '以后从后台发布的项目，会自动出现在这里。'}</span>
+            </div>
+          </Link>
+        </section>
+
+        <section className="botanical-closing" data-reveal>
+          <p>继续走进这座花园</p>
+          <h2>下一篇记录，<br />也许正好能帮到你。</h2>
+          <div className="botanical-actions">
+            <Link className="botanical-button primary" to="/search">搜索你需要的内容</Link>
+            <Link className="botanical-button secondary" to="/about">认识 Flora</Link>
+          </div>
+        </section>
+      </div>
     </Layout>
   )
 }
@@ -309,12 +376,71 @@ function CollectionPage({ page }: { page: keyof typeof collectionConfig }) {
           </div>
         )}
         <div className="collection-grid">
-          {visibleItems.map((item) => <ContentCard key={item.slug} item={item} />)}
+          {visibleItems.map((item, index) => <ContentCard key={item.slug} item={item} index={index} />)}
         </div>
         {page === 'tools' && visibleItems.length === 0 && (
           <div className="no-results"><span>✦</span><h2>这个分类还在积累中</h2><p>可以先看看其他分类，Flora 会在真实使用后继续补充。</p></div>
         )}
       </section>
+    </Layout>
+  )
+}
+
+function ProjectPage() {
+  const { items } = useContent()
+  const scope = useRef<HTMLDivElement>(null)
+  useBotanicalMotion(scope)
+  const projects = withFallbackContent(items).filter((item) => item.type === 'project')
+
+  return (
+    <Layout>
+      <div ref={scope} className="project-showcase">
+        <section className="project-showcase-hero">
+          <img data-hero-image src={botanicalImages.project} alt="白色兰花、黑色郁金香与尤加利叶构成的花艺静物" />
+          <div className="project-showcase-shade" />
+          <div>
+            <p data-hero-reveal>Flora 的项目档案</p>
+            <h1 data-hero-reveal>Ideas become<br /><em>something real.</em></h1>
+            <span data-hero-reveal>这里保存产品、网站与实验项目的目标、过程、结果和复盘。</span>
+          </div>
+        </section>
+
+        <section className="botanical-section project-archive" aria-labelledby="project-archive-title">
+          <div className="botanical-section-heading" data-reveal>
+            <div>
+              <p>项目展厅</p>
+              <h2 id="project-archive-title">每一次动手，<br />都是一次能力的生长。</h2>
+            </div>
+            <Link to="/about">了解我的创作方式 <Arrow /></Link>
+          </div>
+
+          {projects.length > 0 ? (
+            <div className="botanical-project-accordion">
+              {projects.map((project, index) => (
+                <Link
+                  key={project.slug}
+                  to={`/content/${project.slug}`}
+                  className="botanical-project-card"
+                  style={{ backgroundImage: `url(${contentImage(project, index)})` }}
+                >
+                  <div className="botanical-card-shade" />
+                  <div>
+                    <p>{project.category}</p>
+                    <h3>{project.title}</h3>
+                    <span>{project.summary}</span>
+                    <small>{project.date.replaceAll('-', '.')}</small>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="project-empty" data-reveal>
+              <img src={botanicalImages.orchid} alt="深色背景中的紫色兰花" />
+              <div><h2>第一个项目正在发芽。</h2><p>在后台把内容类型选择为“项目作品”并发布，它就会自动进入这个展厅。</p></div>
+            </div>
+          )}
+        </section>
+      </div>
     </Layout>
   )
 }
@@ -344,7 +470,7 @@ function AboutPage() {
   return (
     <Layout>
       <section className="about-hero">
-        <div className="about-image" role="img" aria-label="Flora 与黑猫站在雪山上" />
+        <div className="about-image" role="img" aria-label="酒红色花材与绿色叶片组成的暗色花艺静物" />
         <div className="about-copy">
           <p className="eyebrow">About Flora</p>
           <h1>Help myself,<br />help others.</h1>
@@ -371,6 +497,12 @@ function DetailPage() {
   return (
     <Layout>
       <article className="article-page">
+        {item.type === 'project' && (
+          <div className="project-detail-cover">
+            <img src={contentImage(item)} alt="" />
+            <div className="botanical-card-shade" />
+          </div>
+        )}
         <header className="article-header">
           <Link to={`/${item.type === 'article' ? 'articles' : item.type === 'tool' ? 'tools' : item.type === 'podcast' ? 'podcasts' : 'projects'}`} className="back-link">← 返回{contentTypeLabels[item.type]}</Link>
           <p className="eyebrow">{item.eyebrow}</p>
@@ -387,6 +519,9 @@ function DetailPage() {
               <strong>{'★'.repeat(item.rating)}{'☆'.repeat(5 - item.rating)}</strong>
               <p>适合：{item.suitableFor}</p>
             </div>
+          )}
+          {item.type === 'project' && item.externalUrl && (
+            <a className="project-external-link" href={item.externalUrl} target="_blank" rel="noreferrer">访问项目 <Arrow /></a>
           )}
         </header>
         <div className="article-body">
@@ -450,7 +585,7 @@ function SearchPage() {
         </div>
         <p className="result-count">{query ? `“${query}” 找到 ${results.length} 条内容` : `当前共有 ${results.length} 条示例内容`}</p>
         <div className="collection-grid">
-          {results.map((item) => <ContentCard key={item.slug} item={item} />)}
+          {results.map((item, index) => <ContentCard key={item.slug} item={item} index={index} />)}
         </div>
         {results.length === 0 && <div className="no-results"><span>✦</span><h2>暂时没有找到</h2><p>换一个更简单的关键词试试，或者浏览全部 AI 工具。</p></div>}
       </section>
@@ -676,6 +811,7 @@ function AdminPage() {
                 <div className="editor-grid">
                   <label><span>内容类型</span><select value={draft.type} onChange={(event) => setDraft({ ...draft, type: event.target.value as ContentType })}>{(Object.entries(contentTypeLabels) as [ContentType, string][]).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
                   <label><span>发布日期</span><input type="date" value={draft.date} onChange={(event) => setDraft({ ...draft, date: event.target.value })} /></label>
+                  {draft.type === 'project' && <p className="wide editor-type-hint">发布后会自动进入公开的“项目展厅”，封面图将作为项目主视觉。</p>}
                   <label className="wide"><span>标题</span><input value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} required /></label>
                   <label><span>URL 标识</span><input value={draft.slug} onChange={(event) => setDraft({ ...draft, slug: event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') })} required /></label>
                   <label><span>分类</span><input value={draft.category} onChange={(event) => setDraft({ ...draft, category: event.target.value })} /></label>
@@ -754,7 +890,7 @@ function NotFoundPage() {
     <Layout>
       <section className="not-found">
         <span>404</span>
-        <h1>这片雪地还没有足迹。</h1>
+        <h1>这座花园里，还没有这条小径。</h1>
         <p>你访问的页面不存在，或者已经被 Flora 移走了。</p>
         <Link className="primary-button" to="/">回到首页</Link>
       </section>
@@ -774,7 +910,7 @@ function AppContent() {
         <Route path="/articles" element={<CollectionPage page="articles" />} />
         <Route path="/tools" element={<CollectionPage page="tools" />} />
         <Route path="/podcasts" element={<CollectionPage page="podcasts" />} />
-        <Route path="/projects" element={<CollectionPage page="projects" />} />
+        <Route path="/projects" element={<ProjectPage />} />
         <Route path="/resources" element={<ResourcePage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/content/:slug" element={<DetailPage />} />
