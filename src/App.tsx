@@ -94,7 +94,7 @@ function ContentProvider({ children }: { children: React.ReactNode }) {
 
   const refresh = async () => {
     try {
-      setItems(withFallbackContent(await fetchPublishedContent()))
+      setItems(await fetchPublishedContent())
     } catch {
       setItems(fallbackItems)
     }
@@ -104,7 +104,7 @@ function ContentProvider({ children }: { children: React.ReactNode }) {
     let active = true
     fetchPublishedContent()
       .then((nextItems) => {
-        if (active) setItems(withFallbackContent(nextItems))
+        if (active) setItems(nextItems)
       })
       .catch(() => {
         if (active) setItems(fallbackItems)
@@ -124,7 +124,6 @@ function useContent() {
 function withFallbackContent(items: ManagedContent[]) {
   const seen = new Set(items.map((item) => item.slug))
   return [...items, ...fallbackItems.filter((item) => !seen.has(item.slug))]
-    .sort((first, second) => Number(second.pinned) - Number(first.pinned) || second.date.localeCompare(first.date))
 }
 
 function ScrollToTop() {
