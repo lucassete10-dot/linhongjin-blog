@@ -98,6 +98,25 @@ try {
 
   await desktop.goto(`${baseUrl}/#/tools`, { waitUntil: 'domcontentloaded' })
   await desktop.waitForTimeout(700)
+  const toolsLayout = await desktop.evaluate(() => {
+    const heading = document.querySelector('.collection-page-tools .collection-hero h1')?.getBoundingClientRect()
+    const description = document.querySelector('.collection-page-tools .collection-hero > p')?.getBoundingClientRect()
+    const card = document.querySelector('.collection-page-tools .content-card')?.getBoundingClientRect()
+    const cardTitle = document.querySelector('.collection-page-tools .content-card h3')
+    const titleStyle = cardTitle ? getComputedStyle(cardTitle) : null
+    return {
+      headingDescriptionGap: Math.round((description?.top ?? 0) - (heading?.bottom ?? 0)),
+      firstCardTop: Math.round(card?.top ?? -1),
+      cardHeight: Math.round(card?.height ?? -1),
+      cardTitleLines: cardTitle && titleStyle
+        ? Math.round(cardTitle.getBoundingClientRect().height / Number.parseFloat(titleStyle.lineHeight))
+        : 0,
+    }
+  })
+  await desktop.screenshot({ path: join(outputDirectory, 'tools-desktop.png'), fullPage: true })
+  if (toolsLayout.headingDescriptionGap > 24 || toolsLayout.firstCardTop > 700 || toolsLayout.cardHeight > 280 || toolsLayout.cardTitleLines > 2) {
+    throw new Error(`AI 工具页布局不符合首屏紧凑规范：${JSON.stringify(toolsLayout)}`)
+  }
   const toolFilterCount = await desktop.locator('.filter-row button').count()
   let toolFilterWorks = false
   if (toolFilterCount > 1) {
@@ -142,6 +161,20 @@ try {
   const mobileSearchCardHeight = Math.round((await mobile.locator('.search-results .content-card').first().boundingBox())?.height ?? -1)
   const mobileSearchOverflow = await mobile.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)
   await mobile.screenshot({ path: join(outputDirectory, 'search-mobile.png'), fullPage: true })
+  await mobile.goto(`${baseUrl}/#/tools`, { waitUntil: 'domcontentloaded' })
+  await mobile.waitForTimeout(700)
+  const mobileToolsLayout = await mobile.evaluate(() => {
+    const card = document.querySelector('.collection-page-tools .content-card')?.getBoundingClientRect()
+    return {
+      firstCardTop: Math.round(card?.top ?? -1),
+      cardHeight: Math.round(card?.height ?? -1),
+      horizontalOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    }
+  })
+  await mobile.screenshot({ path: join(outputDirectory, 'tools-mobile.png'), fullPage: true })
+  if (mobileToolsLayout.firstCardTop > 500 || mobileToolsLayout.cardHeight > 430 || mobileToolsLayout.horizontalOverflow) {
+    throw new Error(`移动端 AI 工具页布局不符合首屏紧凑规范：${JSON.stringify(mobileToolsLayout)}`)
+  }
   await mobile.goto(`${baseUrl}/#/content/wechat-voice-input-with-codex`, { waitUntil: 'domcontentloaded' })
   await mobile.waitForTimeout(700)
   await mobile.locator('.article-share').scrollIntoViewIfNeeded()
@@ -156,6 +189,8 @@ try {
     searchLayout,
     mobileSearchCardHeight,
     mobileSearchOverflow,
+    toolsLayout,
+    mobileToolsLayout,
     toolFilterCount,
     toolFilterWorks,
     voiceArticlePublished,
