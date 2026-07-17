@@ -75,6 +75,27 @@ try {
   await desktop.screenshot({ path: join(outputDirectory, 'projects-desktop.png') })
   const projectCardCount = await desktop.locator('.studio-project-card').count()
 
+  await desktop.goto(`${baseUrl}/#/search`, { waitUntil: 'domcontentloaded' })
+  await desktop.waitForTimeout(700)
+  const searchLayout = await desktop.evaluate(() => {
+    const heading = document.querySelector('.search-page-heading h1')?.getBoundingClientRect()
+    const searchBox = document.querySelector('.search-page > .search-box')?.getBoundingClientRect()
+    const card = document.querySelector('.search-results .content-card')?.getBoundingClientRect()
+    const cardTitle = document.querySelector('.search-results .content-card h3')
+    const titleStyle = cardTitle ? getComputedStyle(cardTitle) : null
+    const titleLines = cardTitle && titleStyle ? Math.round(cardTitle.getBoundingClientRect().height / Number.parseFloat(titleStyle.lineHeight)) : 0
+    return {
+      headingLeft: Math.round(heading?.left ?? -1),
+      searchCenterOffset: Math.round(Math.abs(((searchBox?.left ?? 0) + (searchBox?.width ?? 0) / 2) - window.innerWidth / 2)),
+      cardHeight: Math.round(card?.height ?? -1),
+      cardTitleLines: titleLines,
+    }
+  })
+  await desktop.screenshot({ path: join(outputDirectory, 'search-desktop.png'), fullPage: true })
+  if (searchLayout.searchCenterOffset > 2 || searchLayout.cardHeight > 320 || searchLayout.cardTitleLines > 2) {
+    throw new Error(`搜索页布局不符合紧凑规范：${JSON.stringify(searchLayout)}`)
+  }
+
   await desktop.goto(`${baseUrl}/#/tools`, { waitUntil: 'domcontentloaded' })
   await desktop.waitForTimeout(700)
   const toolFilterCount = await desktop.locator('.filter-row button').count()
@@ -116,6 +137,11 @@ try {
   await mobile.waitForTimeout(900)
   const mobileHomeOverflow = await mobile.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)
   await mobile.screenshot({ path: join(outputDirectory, 'home-mobile.png') })
+  await mobile.goto(`${baseUrl}/#/search`, { waitUntil: 'domcontentloaded' })
+  await mobile.waitForTimeout(700)
+  const mobileSearchCardHeight = Math.round((await mobile.locator('.search-results .content-card').first().boundingBox())?.height ?? -1)
+  const mobileSearchOverflow = await mobile.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)
+  await mobile.screenshot({ path: join(outputDirectory, 'search-mobile.png'), fullPage: true })
   await mobile.goto(`${baseUrl}/#/content/wechat-voice-input-with-codex`, { waitUntil: 'domcontentloaded' })
   await mobile.waitForTimeout(700)
   await mobile.locator('.article-share').scrollIntoViewIfNeeded()
@@ -127,6 +153,9 @@ try {
     pinOverlap,
     mobileHomeOverflow,
     projectCardCount,
+    searchLayout,
+    mobileSearchCardHeight,
+    mobileSearchOverflow,
     toolFilterCount,
     toolFilterWorks,
     voiceArticlePublished,
