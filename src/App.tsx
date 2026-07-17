@@ -617,8 +617,9 @@ function SearchPage() {
   return (
     <Layout>
       <section className="search-page">
-        <p className="eyebrow">Search the space</p>
-        <h1>找到你正在寻找的内容</h1>
+        <header className="search-page-heading">
+          <h1>找到你正在寻找的内容</h1>
+        </header>
         <form className="search-box" onSubmit={submit}>
           <span aria-hidden="true">⌕</span>
           <input value={value} onChange={(event) => setValue(event.target.value)} placeholder="输入关键词……" autoFocus />
@@ -630,8 +631,8 @@ function SearchPage() {
             <button key={key} className={type === key ? 'active' : ''} onClick={() => setType(key)}>{label}</button>
           ))}
         </div>
-        <p className="result-count">{query ? `“${query}” 找到 ${results.length} 条内容` : `当前共有 ${results.length} 条示例内容`}</p>
-        <div className="collection-grid">
+        <p className="result-count">{query ? `“${query}” 找到 ${results.length} 条内容` : `当前共有 ${results.length} 条内容`}</p>
+        <div className="collection-grid search-results">
           {results.map((item, index) => <ContentCard key={item.slug} item={item} index={index} />)}
         </div>
         {results.length === 0 && <div className="no-results"><span>✦</span><h2>暂时没有找到</h2><p>换一个更简单的关键词试试，或者浏览全部 AI 工具。</p></div>}
