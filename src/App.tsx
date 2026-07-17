@@ -399,34 +399,35 @@ function CollectionPage({ page }: { page: keyof typeof collectionConfig }) {
 
   return (
     <Layout>
-      <section className="page-hero">
-        <p className="eyebrow">{config.eyebrow}</p>
-        <h1>{config.title}</h1>
-        <p>{config.description}</p>
-      </section>
-      <section className="page-content">
-        {page === 'tools' && availableToolFilters.length > 1 && (
-          <div className="filter-row" aria-label="筛选 AI 工具">
-            {availableToolFilters.map((label) => (
-              <button
-                key={label}
-                type="button"
-                className={label === activeToolFilter ? 'active' : ''}
-                aria-pressed={label === activeToolFilter}
-                onClick={() => setToolFilter(label)}
-              >
-                {label}
-              </button>
-            ))}
+      <div className={`collection-page collection-page-${page}`}>
+        <section className="page-hero collection-hero">
+          <h1>{config.title}</h1>
+          <p>{config.description}</p>
+        </section>
+        <section className="page-content collection-content">
+          {page === 'tools' && availableToolFilters.length > 1 && (
+            <div className="filter-row" aria-label="筛选 AI 工具">
+              {availableToolFilters.map((label) => (
+                <button
+                  key={label}
+                  type="button"
+                  className={label === activeToolFilter ? 'active' : ''}
+                  aria-pressed={label === activeToolFilter}
+                  onClick={() => setToolFilter(label)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="collection-grid collection-list">
+            {visibleItems.map((item, index) => <ContentCard key={item.slug} item={item} index={index} />)}
           </div>
-        )}
-        <div className="collection-grid">
-          {visibleItems.map((item, index) => <ContentCard key={item.slug} item={item} index={index} />)}
-        </div>
-        {page === 'tools' && visibleItems.length === 0 && (
-          <div className="no-results"><span>✦</span><h2>这个分类还在积累中</h2><p>可以先看看其他分类，Flora 会在真实使用后继续补充。</p></div>
-        )}
-      </section>
+          {page === 'tools' && visibleItems.length === 0 && (
+            <div className="no-results"><span>✦</span><h2>这个分类还在积累中</h2><p>可以先看看其他分类，Flora 会在真实使用后继续补充。</p></div>
+          )}
+        </section>
+      </div>
     </Layout>
   )
 }
