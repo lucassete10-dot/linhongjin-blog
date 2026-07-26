@@ -37,10 +37,13 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: |
-          if node scripts/export-supabase-content.mjs --out dist/export; then
+          if out=$(node scripts/export-supabase-content.mjs --out dist/export 2>&1); then
+            echo "$out"
             echo "export ok:" && ls dist/export
           else
-            echo "::warning::legacy export failed with exit $? (non-fatal)"
+            echo "$out"
+            short=$(echo "$out" | tail -c 380 | tr '\n' ' ')
+            echo "::warning::legacy export failed: $short"
           fi
       - name: Configure Pages
         uses: actions/configure-pages@v5
