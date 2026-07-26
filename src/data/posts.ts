@@ -1,156 +1,72 @@
-export type Block =
-  | { type: 'p'; text: string }
-  | { type: 'h2'; text: string }
-  | { type: 'quote'; text: string }
-  | { type: 'list'; items: string[] }
-
 export type Motif = 'torii' | 'coffee' | 'wind' | 'books' | 'road' | 'lantern'
 export type Palette = 'warm' | 'olive' | 'dusk'
+export type Category = '学习' | '旅行' | '生活'
 
 export interface Post {
   slug: string
   title: string
+  date: string
+  category: Category
+  kind: string
   place: string
   stamp: string
-  category: string
-  date: string
   readTime: string
   excerpt: string
   motif: Motif
   palette: Palette
   tags: string[]
-  content: Block[]
+  featured: boolean
+  sample: boolean
+  markdown: string
 }
 
-export const posts: Post[] = [
-  {
-    slug: 'kyoto-autumn',
-    title: '京都的秋天，从一碗热荞麦面开始',
-    place: '日本 · 京都',
-    stamp: 'KYOTO / NOV',
-    category: '旅行笔记',
-    date: '2026-06-02',
-    readTime: '6 分钟',
-    excerpt: '避开人潮的办法只有一个：比所有人起得早。以及，永观堂的红叶值得那个早起。',
-    motif: 'torii',
-    palette: 'warm',
-    tags: ['京都', '红叶', '独行'],
-    content: [
-      { type: 'p', text: '六点半的京都，游客还没有醒。我沿着白川走，水声比脚步声大，两岸的枫树刚刚开始转红——不是明信片上那种整齐的红，而是一棵树上同时住着绿、黄、橙、红四个季节。' },
-      { type: 'p', text: '永观堂八点开门。七点五十，门口只有五个人，都是本地的老人。八点零五分，我站在多宝塔下面，整个山谷的红叶铺在脚下，安静得能听见叶子落地。' },
-      { type: 'quote', text: '避开人潮的办法只有一个：比所有人起得早。' },
-      { type: 'h2', text: '一碗面的热气' },
-      { type: 'p', text: '十点，气温还没上来，手是凉的。哲学之道旁边有家小店，只有六个座位，老板娘不会英文，我不会日文，菜单上只有三种面。我指了指邻座那碗，她点点头。' },
-      { type: 'p', text: '荞麦面上来的时候，热气糊了我的眼镜。那一瞬间什么都看不见，只能闻到出汁的味道，听见店里收音机放着演歌。眼镜清透之后，窗外正好落下一片红叶。' },
-      { type: 'p', text: '旅行里最好的部分，从来不在攻略里。攻略能告诉你几点开门，不能告诉你热气会糊住眼镜。' },
-      { type: 'h2', text: '给同样想去的你' },
-      { type: 'list', items: ['红叶季住东山一带，早起步行就能到永观堂和南禅寺', '周二的人最少，其次是周三', '别把行程排满，留一个下午给白川，什么都不做'] },
-    ],
-  },
-  {
-    slug: 'chiangmai-cafe',
-    title: '清迈的咖啡馆，没有一家着急',
-    place: '泰国 · 清迈',
-    stamp: 'CHIANG MAI / JAN',
-    category: '城市漫游',
-    date: '2026-04-18',
-    readTime: '5 分钟',
-    excerpt: '店主先逗了五分钟猫，才想起来我点过一杯手冲。而我竟然也不着急了。',
-    motif: 'coffee',
-    palette: 'olive',
-    tags: ['清迈', '咖啡', '慢生活'],
-    content: [
-      { type: 'p', text: '在清迈古城，你不需要找咖啡馆，咖啡馆会找你。拐进任何一条巷子，走五十米，一定有一家：木头房子，院子里种着芭蕉，菜单是手写的，猫比店员多。' },
-      { type: 'p', text: '我最常去的那家没有名字，或者说有，但招牌被三角梅挡住了。店主是个五十岁上下的大叔，冲咖啡之前先逗了五分钟猫，才想起来我点过一杯手冲。' },
-      { type: 'quote', text: '奇怪的是，我竟然也不着急了。' },
-      { type: 'p', text: '泰北的豆子带一点果酸，水温压得低，入口是温的。大叔用下巴指指院子里的躺椅，意思是坐那儿去。我在那把躺椅上看完了半本书，起来的时候天已经黄了。' },
-      { type: 'h2', text: '慢不是效率的反义词' },
-      { type: 'p', text: '回来以后我常想那个下午。我们习惯把「慢」当成「低效」，但清迈的咖啡馆生意都不坏——它们只是把「快」从体验里删掉了，剩下的部分反而更值钱。' },
-      { type: 'p', text: '做产品、写博客，道理大概也一样。少一点着急，多一点芭蕉和猫。' },
-    ],
-  },
-  {
-    slug: 'dali-wind',
-    title: '大理的风，会把计划吹散',
-    place: '中国 · 云南',
-    stamp: 'DALI / MAR',
-    category: '旅行笔记',
-    date: '2026-03-09',
-    readTime: '4 分钟',
-    excerpt: '我带着一张排到小时的行程表去大理，第二天它就作废了。这是大理给我上的第一课。',
-    motif: 'wind',
-    palette: 'dusk',
-    tags: ['大理', '洱海', '计划'],
-    content: [
-      { type: 'p', text: '我是带着一张 Excel 去大理的：三天，九个点位，精确到小时。第一天下午，它就作废了——因为我在才村的码头坐下来看了一会儿洱海，一看就是三个小时。' },
-      { type: 'p', text: '大理的风很大，下关的风尤其大，大到你走路要侧着身子。风把云吹得跑起来，光斑在苍山上一块一块地移动，海面的颜色十分钟换一次。你盯着看，就走不动了。' },
-      { type: 'quote', text: '有些地方是用来完成的，有些地方是用来待着的。搞混了，两头都亏。' },
-      { type: 'p', text: '第二天我把 Excel 删了，只留三件事：早上买一个喜洲粑粑，下午在海西找个安静的地方坐着，晚上吃一碗小锅米线。剩下的交给风。' },
-      { type: 'p', text: '事实证明，风安排得比我好。' },
-    ],
-  },
-  {
-    slug: 'tokyo-bookstore',
-    title: '在东京，书店比居酒屋开得晚',
-    place: '日本 · 东京',
-    stamp: 'TOKYO / OCT',
-    category: '城市漫游',
-    date: '2026-02-21',
-    readTime: '5 分钟',
-    excerpt: '夜里十一点，下北泽的旧书店还亮着灯。我买了一本完全看不懂的书，至今不后悔。',
-    motif: 'books',
-    palette: 'warm',
-    tags: ['东京', '书店', '夜晚'],
-    content: [
-      { type: 'p', text: '夜里十一点，居酒屋开始赶人，下北泽的一家旧书店还亮着灯。店很窄，书堆到天花板，过道只容一个人侧身。老板在柜台后面修一本书脊开裂的旧书，头也不抬。' },
-      { type: 'p', text: '我在艺术书架前站了很久，抽出一本讲日本民艺的书。全是日文，我一个字都看不懂，但里面的器物图片印得极好：一只碗，一把勺子，一块蓝染的布。' },
-      { type: 'h2', text: '为什么要买看不懂的书' },
-      { type: 'p', text: '因为书是最便宜的纪念品，也是最重的。它逼你回家以后继续和这趟旅行发生关系——查资料，学几个词，或者只是翻图片，回忆那条深夜的街。' },
-      { type: 'quote', text: '冰箱贴三天就融进背景里，一本看不懂的书会烦你很多年。烦着烦着，就懂了一点。' },
-      { type: 'p', text: '那本民艺的书现在还在我桌上。我已经能认出「柳宗悦」三个字了，这大概就是进度。' },
-    ],
-  },
-  {
-    slug: 'iceland-road',
-    title: '冰岛环岛：一条路开到没有形容词',
-    place: '冰岛 · 一号公路',
-    stamp: 'ICELAND / SEP',
-    category: '在路上',
-    date: '2025-12-14',
-    readTime: '7 分钟',
-    excerpt: '第三天之后我们不再说「哇」，也不再拍照。语言用完了，剩下的路交给沉默。',
-    motif: 'road',
-    palette: 'dusk',
-    tags: ['冰岛', '自驾', '风景'],
-    content: [
-      { type: 'p', text: '一号公路的前两天，车里很热闹：每过一个山口都有人喊停车，每片瀑布都要拍照，「太美了」说了大概一百遍。' },
-      { type: 'p', text: '第三天之后，车里安静下来。不是审美疲劳——是语言用完了。黑沙滩、冰河湖、苔原、火山口，这些东西超出了形容词的射程。你说「壮观」，说出口就觉得对不起眼前的景象。' },
-      { type: 'quote', text: '真正的风景会让人闭嘴。' },
-      { type: 'h2', text: '沉默是更高级的赞美' },
-      { type: 'p', text: '后半程我们养成了新习惯：看到特别好的景，就把车停下，熄火，摇下车窗，谁也不说话，坐五分钟再走。风灌进来，带着冰川的凉气。' },
-      { type: 'p', text: '回国以后翻照片，拍得最好的几张都来自前两天。但记得最牢的，全是后几天那些没有照片的五分钟。' },
-      { type: 'p', text: '相机记录风景，沉默记录你和风景的关系。' },
-    ],
-  },
-  {
-    slug: 'quanzhou-alley',
-    title: '泉州的巷子里，神明和早餐排在一起',
-    place: '中国 · 福建',
-    stamp: 'QUANZHOU / MAY',
-    category: '城市漫游',
-    date: '2025-11-08',
-    readTime: '5 分钟',
-    excerpt: '关帝庙的香火飘进隔壁面线糊的锅里。在泉州，人间和神明共用一条巷子。',
-    motif: 'lantern',
-    palette: 'warm',
-    tags: ['泉州', '古城', '早餐'],
-    content: [
-      { type: 'p', text: '早上七点的西街，关帝庙已经排队了，隔壁的面线糊摊也排队了。两条队伍背对背，一条求平安，一条求加蛋。香火的烟飘过来，混进锅里的热气，谁也不觉得违和。' },
-      { type: 'p', text: '泉州的神明密度大概是全国最高的：开元寺供佛，天后宫拜妈祖，清净寺是伊斯兰的，还有基督教堂和关帝庙，全在步行范围内。一千年前的世界主义，就这么活在巷子里。' },
-      { type: 'h2', text: '烟火气的配方' },
-      { type: 'p', text: '面线糊本身是温柔的食物：糊是稀的，面线细得几乎化掉，配料自己选，醋肉、大肠、海蛎，最后淋一点当归酒。坐在塑料凳上吃完，看对面阿婆给孙子举着油条。' },
-      { type: 'quote', text: '所谓烟火气，就是神明也管不着你早餐加几样配料。' },
-      { type: 'p', text: '离开那天我又去排了一次队。这次两条都排了：一条谢过关帝，一条加了两个蛋。' },
-    ],
-  },
-]
+export const categories: Category[] = ['学习', '旅行', '生活']
+
+/* 极简 frontmatter 解析：--- 包围的 key: value 区块 + 正文 markdown。
+   写文章只需要在 content/ 放一个 .md 文件，推送后自动构建上线。 */
+function parseFrontmatter(raw: string): { meta: Record<string, string>; body: string } {
+  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/)
+  if (!match) return { meta: {}, body: raw }
+  const meta: Record<string, string> = {}
+  for (const line of match[1].split(/\r?\n/)) {
+    const idx = line.indexOf(':')
+    if (idx > 0) meta[line.slice(0, idx).trim()] = line.slice(idx + 1).trim()
+  }
+  return { meta, body: match[2].trim() }
+}
+
+const MOTIFS: Motif[] = ['torii', 'coffee', 'wind', 'books', 'road', 'lantern']
+const PALETTES: Palette[] = ['warm', 'olive', 'dusk']
+
+const files = import.meta.glob('../../content/*.md', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>
+
+export const posts: Post[] = Object.entries(files)
+  .map(([path, raw]) => {
+    const slug = path.split('/').pop()!.replace(/\.md$/, '')
+    const { meta, body } = parseFrontmatter(raw)
+    const motif = MOTIFS.includes(meta.motif as Motif) ? (meta.motif as Motif) : MOTIFS[slug.length % MOTIFS.length]
+    const palette = PALETTES.includes(meta.palette as Palette) ? (meta.palette as Palette) : PALETTES[slug.length % PALETTES.length]
+    const category: Category = meta.category === '学习' || meta.category === '生活' ? meta.category : '旅行'
+    return {
+      slug,
+      title: meta.title ?? slug,
+      date: meta.date ?? '',
+      category,
+      kind: meta.kind || category,
+      place: meta.place ?? '',
+      stamp: meta.stamp ?? slug.toUpperCase().slice(0, 12),
+      readTime: meta.readTime ?? '',
+      excerpt: meta.excerpt ?? '',
+      motif,
+      palette,
+      tags: meta.tags ? meta.tags.split(/[,，、]/).map((t) => t.trim()).filter(Boolean) : [],
+      featured: meta.featured === 'true',
+      sample: meta.sample === 'true',
+      markdown: body,
+    }
+  })
+  .sort((a, b) => (a.date < b.date ? 1 : -1))

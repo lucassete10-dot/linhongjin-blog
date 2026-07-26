@@ -1,0 +1,41 @@
+name: Export old Supabase content
+
+# 一次性迁移任务：把旧 Help Myself 的已发布文章导出为 Markdown，
+# 提交到 supabase-export 分支供审核（不影响线上）。
+# 推送本文件时自动运行一次，之后可在 Actions 页手动触发。
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/export-content.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Export published content
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: node scripts/export-supabase-content.mjs | tee export.log
+      - name: Publish list to job summary
+        run: |
+          echo "## Supabase 导出结果" >> "$GITHUB_STEP_SUMMARY"
+          cat export.log >> "$GITHUB_STEP_SUMMARY"
+      - name: Commit to supabase-export branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B supabase-export
+          git add content-import
+          git commit -m "chore: 导出 Supabase 旧文章供审核" || echo "nothing to commit"
+          git push -f origin supabase-export

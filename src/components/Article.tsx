@@ -1,26 +1,8 @@
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { posts, type Block } from '@/data/posts'
+import { posts } from '@/data/posts'
 import { PostCover } from './Scene'
-
-function renderBlock(block: Block, index: number) {
-  switch (block.type) {
-    case 'h2':
-      return <h2 key={index}>{block.text}</h2>
-    case 'quote':
-      return <blockquote key={index}>{block.text}</blockquote>
-    case 'list':
-      return (
-        <ul key={index}>
-          {block.items.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      )
-    default:
-      return <p key={index}>{block.text}</p>
-  }
-}
+import { MarkdownContent } from './MarkdownContent'
 
 export function Article() {
   const { slug } = useParams()
@@ -36,7 +18,7 @@ export function Article() {
         to="/"
         className="mb-10 inline-flex items-center gap-2 font-sans text-[13px] font-semibold uppercase tracking-[0.1em] text-wandor-muted transition-opacity hover:opacity-60"
       >
-        <ArrowLeft className="h-4 w-4" /> 全部笔记
+        <ArrowLeft className="h-4 w-4" /> 全部文章
       </Link>
 
       <header className="relative mb-9">
@@ -47,18 +29,31 @@ export function Article() {
         >
           {post.stamp}
         </div>
+        {post.sample && (
+          <p className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-wandor-prompt/40 bg-white/60 px-3 py-1 font-sans text-[12px] font-medium text-wandor-prompt">
+            示例文章 · 占位用，将由博主的真实文章逐篇替换
+          </p>
+        )}
         <p className="mb-3 font-sans text-[12px] font-semibold uppercase tracking-[0.14em] text-wandor-prompt">
-          {post.category} · {post.place}
+          {post.kind}{post.place ? ` · ${post.place}` : ''}
         </p>
         <h1 className="mb-5 max-w-[620px] font-sans text-[clamp(30px,5vw,44px)] font-semibold leading-[1.25] tracking-[-0.02em] text-wandor-text">
           {post.title}
         </h1>
-        <div className="flex items-center gap-3 font-sans text-[13px] text-wandor-muted">
+        <div className="flex flex-wrap items-center gap-3 font-sans text-[13px] text-wandor-muted">
           <span>{post.date}</span>
-          <span aria-hidden="true">·</span>
-          <span>{post.readTime}</span>
-          <span aria-hidden="true">·</span>
-          <span>{post.tags.map((tag) => `#${tag}`).join(' ')}</span>
+          {post.readTime && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span>{post.readTime}</span>
+            </>
+          )}
+          {post.tags.length > 0 && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span>{post.tags.map((tag) => `#${tag}`).join(' ')}</span>
+            </>
+          )}
         </div>
       </header>
 
@@ -68,9 +63,10 @@ export function Article() {
         </div>
       </div>
 
-      <div className="article-prose font-sans text-[17px] text-wandor-text">{post.content.map(renderBlock)}</div>
+      <div className="article-prose font-sans text-[17px] text-wandor-text">
+        <MarkdownContent markdown={post.markdown} />
+      </div>
 
-      {/* 文末 */}
       <div aria-hidden="true" className="my-14 text-center font-sans text-lg text-wandor-rust">
         ✳
       </div>
