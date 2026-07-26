@@ -36,7 +36,12 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-        run: node scripts/export-supabase-content.mjs --out dist/export || echo "export skipped"
+        run: |
+          if node scripts/export-supabase-content.mjs --out dist/export; then
+            echo "export ok:" && ls dist/export
+          else
+            echo "::warning::legacy export failed with exit $? (non-fatal)"
+          fi
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages artifact
