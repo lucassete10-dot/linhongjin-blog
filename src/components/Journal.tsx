@@ -27,7 +27,7 @@ export function Journal() {
 
   return (
     <section id="journal" className="mx-auto max-w-page px-20 pb-28 pt-8 max-md:px-6">
-      <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
+      <header className="reveal mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="mb-2 font-display text-sm uppercase tracking-[0.18em] text-wandor-prompt">Field Notes</p>
           <h2 className="font-cn text-[36px] font-bold tracking-[0.01em] text-wandor-text max-md:text-[28px]">
@@ -48,7 +48,7 @@ export function Journal() {
       </header>
 
       {/* 分类筛选胶囊 */}
-      <div className="mb-10 flex flex-wrap gap-2.5" role="tablist" aria-label="按分类筛选">
+      <div className="reveal mb-10 flex flex-wrap gap-2.5" role="tablist" aria-label="按分类筛选">
         {[null, ...categories].map((c) => {
           const active = c === activeCat
           return (
@@ -81,11 +81,12 @@ export function Journal() {
         </div>
       ) : (
         <div className="grid grid-cols-3 gap-6 max-lg:grid-cols-2 max-md:grid-cols-1">
-          {visible.map((post) => (
+          {visible.map((post, index) => (
             <Link
               key={post.slug}
               to={`/post/${post.slug}`}
-              className="group overflow-hidden rounded-[28px] border border-[#e5d8ba] bg-[#fffdf6] shadow-[0_2px_10px_rgba(144,88,49,0.06)] transition-all hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(144,88,49,0.14)]"
+              style={{ transitionDelay: `${(index % 3) * 90}ms` }}
+              className="reveal group overflow-hidden rounded-[28px] border border-[#e5d8ba] bg-[#fffdf6] shadow-[0_2px_10px_rgba(144,88,49,0.06)] transition-all hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(144,88,49,0.14)]"
             >
               <div className="aspect-[10/7] overflow-hidden">
                 <div className="h-full w-full transition-transform duration-500 group-hover:scale-[1.03]">

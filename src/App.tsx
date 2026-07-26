@@ -4,6 +4,7 @@ import { Hero } from '@/components/Hero'
 import { Journal } from '@/components/Journal'
 import { Article } from '@/components/Article'
 import { SiteNav } from '@/components/SiteNav'
+import { QuanzhouScene } from '@/components/Scene'
 import { posts } from '@/data/posts'
 
 declare global {
@@ -27,6 +28,57 @@ function ScrollToTop() {
   }, [pathname, search])
 
   return null
+}
+
+/* 滚动进入视口时给 .reveal 元素加 is-visible（淡入上浮动效） */
+function useRevealOnScroll() {
+  const { pathname, search } = useLocation()
+  useEffect(() => {
+    // 用滚动监听 + 位置计算实现（IntersectionObserver 在部分内嵌 webview 中不回调）
+    let pending = [...document.querySelectorAll<HTMLElement>('.reveal:not(.is-visible)')]
+    if (pending.length === 0) return
+    // 动画结束后摘掉 reveal 类，把 transition 还给元素自己的 hover 效果
+    const settle = (el: HTMLElement) => {
+      window.setTimeout(() => {
+        el.classList.remove('reveal', 'is-visible')
+        el.style.transitionDelay = ''
+      }, 1100)
+    }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      pending.forEach((el) => {
+        el.classList.remove('reveal')
+        el.style.transitionDelay = ''
+      })
+      return
+    }
+    const check = () => {
+      const viewportH = window.innerHeight
+      if (!viewportH) return
+      pending = pending.filter((el) => {
+        if (el.getBoundingClientRect().top < viewportH * 0.94) {
+          el.classList.add('is-visible')
+          settle(el)
+          return false
+        }
+        return true
+      })
+      if (pending.length === 0) detach()
+    }
+    const detach = () => {
+      window.removeEventListener('scroll', check)
+      window.removeEventListener('resize', check)
+    }
+    // 元素很少，直接在滚动事件里计算即可；不用 rAF 节流
+    //（部分内嵌 webview 不产帧，rAF 回调永远不执行）
+    window.addEventListener('scroll', check, { passive: true })
+    window.addEventListener('resize', check, { passive: true })
+    check()
+    const lateCheck = window.setTimeout(check, 350)
+    return () => {
+      window.clearTimeout(lateCheck)
+      detach()
+    }
+  }, [pathname, search])
 }
 
 function Footer() {
@@ -89,6 +141,7 @@ function About() {
 
 export default function App() {
   const { pathname } = useLocation()
+  useRevealOnScroll()
   return (
     <div className="min-h-svh w-full">
       <ScrollToTop />
@@ -98,6 +151,10 @@ export default function App() {
         <Route path="/about" element={<About />} />
         <Route path="/post/:slug" element={<Article />} />
       </Routes>
+      {/* 页尾的泉州风景带：东西塔、钟楼、红砖厝、清净寺、洛阳桥 */}
+      <div aria-hidden="true" className="reveal pointer-events-none relative mt-16 h-[300px] w-full overflow-hidden max-md:h-[200px]">
+        <QuanzhouScene />
+      </div>
       <Footer />
     </div>
   )

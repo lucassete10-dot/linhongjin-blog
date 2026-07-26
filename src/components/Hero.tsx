@@ -56,6 +56,12 @@ export function Hero({ onShuffle, onRead }: HeroProps) {
         style={{ background: 'linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)' }}
       />
 
+      {/* 底部渐隐：让视频插画自然融进下方页面，上下背景不再割裂 */}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-24"
+        style={{ background: 'linear-gradient(180deg, rgba(241,237,225,0) 0%, #f1ede1 94%)' }}
+      />
+
       <div className="relative z-[2]">
         <SiteNav />
 

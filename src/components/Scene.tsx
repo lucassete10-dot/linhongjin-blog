@@ -505,3 +505,166 @@ export function PostCover({ motif, palette }: { motif: Motif; palette: Palette }
     </svg>
   )
 }
+
+/* ---------- 泉州风景带（页尾装饰） ---------- */
+
+/** 开元寺石塔（东西塔）：五层楼阁式石塔 */
+function StonePagoda({ x, y, s = 1 }: { x: number; y: number; s?: number }) {
+  const tiers = [0, 1, 2, 3, 4]
+  return (
+    <g transform={`translate(${x},${y}) scale(${s})`}>
+      <rect x={-32} y={-10} width={64} height={10} rx={2} fill="#c9bda0" />
+      {tiers.map((n) => {
+        const w = 52 - n * 8
+        const bodyH = 25 - n * 2
+        const base = -10 - tiers.slice(0, n).reduce((acc, i) => acc + (25 - i * 2) + 9, 0)
+        return (
+          <g key={n}>
+            <rect x={-w / 2} y={base - bodyH} width={w} height={bodyH} fill="#d9cfb6" />
+            <path d={`M${-w / 2 + 4} ${base - bodyH} L${-w / 2 + 4} ${base} M${w / 2 - 4} ${base - bodyH} L${w / 2 - 4} ${base}`} stroke="#a89878" strokeWidth={1.6} />
+            <path
+              d={`M${-w / 2 - 8} ${base - bodyH} C${-w / 4} ${base - bodyH - 7} ${w / 4} ${base - bodyH - 7} ${w / 2 + 8} ${base - bodyH} L${w / 2 + 4} ${base - bodyH - 8} C${w / 4} ${base - bodyH - 14} ${-w / 4} ${base - bodyH - 14} ${-w / 2 - 4} ${base - bodyH - 8} Z`}
+              fill="#b5a888"
+              stroke="#8a7d60"
+              strokeWidth={1.2}
+            />
+          </g>
+        )
+      })}
+      <path d="M-4 -175 L4 -175 L2 -196 L-2 -196 Z" fill="#8a7d60" />
+      <circle cx={0} cy={-199} r={2.6} fill="#8a7d60" />
+      <circle cx={0} cy={-206} r={2} fill="#8a7d60" />
+      <rect x={-6} y={-32} width={12} height={22} rx={5} fill="#6b6353" />
+    </g>
+  )
+}
+
+/** 西街钟楼 */
+function ClockTower({ x, y, s = 1 }: { x: number; y: number; s?: number }) {
+  return (
+    <g transform={`translate(${x},${y}) scale(${s})`}>
+      <rect x={-13} y={-118} width={26} height={118} fill={BONE} stroke="#a89878" strokeWidth={2} />
+      <rect x={-17} y={-126} width={34} height={8} rx={3} fill="#b5a888" />
+      <rect x={-11} y={-134} width={22} height={8} rx={3} fill={BONE} stroke="#a89878" strokeWidth={1.6} />
+      <circle cx={0} cy={-104} r={9} fill={BONE} stroke={INK} strokeWidth={2} />
+      <path d="M0 -104 L0 -110 M0 -104 L4 -101" stroke={INK} strokeWidth={1.8} strokeLinecap="round" />
+      <path d="M-5 -84 L-5 -60 M5 -84 L5 -60 M-5 -44 L-5 -20 M5 -44 L5 -20" stroke="#a89878" strokeWidth={2.4} strokeLinecap="round" />
+    </g>
+  )
+}
+
+/** 闽南红砖古厝：燕尾脊 */
+function MinnanHouse({ x, y, s = 1 }: { x: number; y: number; s?: number }) {
+  return (
+    <g transform={`translate(${x},${y}) scale(${s})`}>
+      <rect x={-46} y={-40} width={92} height={40} fill="#b0562f" />
+      <path d="M-46 -28 L46 -28 M-46 -16 L46 -16 M-20 -40 L-20 -28 M14 -28 L14 -16 M-30 -16 L-30 0 M28 -16 L28 0" stroke="#8a3a20" strokeWidth={1.5} opacity={0.85} />
+      <path
+        d="M-58 -38 Q-64 -52 -52 -47 C-26 -56 26 -56 52 -47 Q64 -52 58 -38 L50 -36 C25 -46 -25 -46 -50 -36 Z"
+        fill="#8a4a2e"
+        stroke="#6b3418"
+        strokeWidth={1.4}
+      />
+      <rect x={-9} y={-22} width={18} height={22} rx={2} fill={BONE} />
+      <rect x={-34} y={-24} width={12} height={11} rx={2} fill={BONE} />
+      <rect x={22} y={-24} width={12} height={11} rx={2} fill={BONE} />
+    </g>
+  )
+}
+
+/** 清净寺石门楼（尖拱） */
+function StoneGate({ x, y, s = 1 }: { x: number; y: number; s?: number }) {
+  return (
+    <g transform={`translate(${x},${y}) scale(${s})`}>
+      <rect x={-34} y={-76} width={68} height={76} fill="#cfc6b0" stroke="#a89878" strokeWidth={2} />
+      <path d="M-30 -76 L-30 -84 L-20 -84 L-20 -76 M-10 -76 L-10 -84 L0 -84 L0 -76 M10 -76 L10 -84 L20 -84 L20 -76 M30 -76 L30 -84 L24 -84" stroke="#a89878" strokeWidth={2} fill="none" />
+      <path d="M-14 0 L-14 -34 Q-14 -52 0 -58 Q14 -52 14 -34 L14 0 Z" fill="#6b6353" />
+      <path d="M-20 0 L-20 -36 Q-20 -58 0 -66 Q20 -58 20 -36 L20 0" stroke="#a89878" strokeWidth={1.6} fill="none" />
+    </g>
+  )
+}
+
+/** 洛阳桥：船形墩石梁桥与帆影 */
+function StoneBridge({ x, y, s = 1 }: { x: number; y: number; s?: number }) {
+  return (
+    <g transform={`translate(${x},${y}) scale(${s})`}>
+      <rect x={-170} y={2} width={340} height={22} rx={4} fill="#9aa07c" />
+      <path d="M-140 12 C-132 8 -124 8 -116 12 M-60 16 C-52 12 -44 12 -36 16 M40 12 C48 8 56 8 64 12 M120 16 C128 12 136 12 144 16" stroke={BONE} strokeWidth={2} fill="none" strokeLinecap="round" />
+      {[-120, -60, 0, 60, 120].map((px) => (
+        <path key={px} d={`M${px - 14} 2 L${px + 14} 2 L${px + 8} 12 L${px} 16 L${px - 8} 12 Z`} fill="#b5a888" stroke="#8a7d60" strokeWidth={1.2} />
+      ))}
+      <rect x={-160} y={-8} width={320} height={10} rx={3} fill="#d9cfb6" stroke="#a89878" strokeWidth={1.6} />
+      <path d="M-150 -8 L-150 -16 M-110 -8 L-110 -14 M150 -8 L150 -16 M110 -8 L110 -14" stroke="#8a7d60" strokeWidth={2} strokeLinecap="round" />
+      <g transform="translate(196,8)">
+        <path d="M-12 8 L12 8 L7 13 L-7 13 Z" fill="#8a5a33" />
+        <path d="M0 6 L0 -16 C7 -11 10 -4 11 6 Z" fill={BONE} stroke="#8a5a33" strokeWidth={1.6} />
+      </g>
+    </g>
+  )
+}
+
+/** 泉州风景带（1440 × 380）：东西塔、钟楼、红砖厝、清净寺、洛阳桥 */
+export function QuanzhouScene() {
+  const uid = useId().replace(/[^a-zA-Z0-9]/g, '')
+  return (
+    <svg viewBox="0 0 1440 380" preserveAspectRatio="xMidYMax slice" className="block h-full w-full" aria-hidden="true">
+      <Defs uid={uid} seed={77} />
+
+      <g filter={`url(#rough-soft-${uid})`}>
+        <circle cx={1180} cy={92} r={40} fill="#d7a944" opacity={0.9} />
+        <Cloud x={220} y={70} s={0.95} />
+        <Cloud x={760} y={52} s={0.7} />
+      </g>
+      <Birds x={620} y={104} />
+
+      <g filter={`url(#rough-${uid})`}>
+        <path
+          d="M0 292 C160 262 300 282 460 264 C640 244 760 276 940 258 C1100 242 1240 270 1440 250 L1440 380 L0 380 Z"
+          fill="#d9a866"
+          opacity={0.5}
+        />
+        <path
+          d="M0 330 C180 300 340 322 520 304 C700 288 860 318 1040 302 C1200 288 1330 312 1440 298 L1440 380 L0 380 Z"
+          fill="#a8ad7f"
+        />
+        <path
+          d="M0 368 C220 340 460 362 700 348 C940 334 1160 360 1440 344 L1440 380 L0 380 Z"
+          fill="#c98a5e"
+        />
+      </g>
+
+      <g filter={`url(#rough-soft-${uid})`}>
+        {/* 开元寺东西塔 */}
+        <StonePagoda x={280} y={330} s={1.0} />
+        <StonePagoda x={432} y={334} s={0.85} />
+        {/* 西街钟楼 */}
+        <ClockTower x={600} y={336} s={1.0} />
+        {/* 燕尾脊红砖厝 */}
+        <MinnanHouse x={790} y={338} s={1.0} />
+        <MinnanHouse x={922} y={344} s={0.85} />
+        {/* 清净寺 */}
+        <StoneGate x={1062} y={340} s={1.0} />
+        {/* 洛阳桥 */}
+        <StoneBridge x={1300} y={330} s={1.0} />
+
+        <RoundTree x={150} y={318} s={0.9} fill="#4c5c44" vein={BONE} />
+        <RoundTree x={520} y={322} s={0.72} />
+        <SlimTree x={692} y={330} s={0.8} />
+        <RoundTree x={996} y={330} s={0.7} fill="#4c5c44" vein={BONE} />
+        <Bush x={230} y={350} s={0.8} dark />
+        <Bush x={860} y={356} s={0.7} />
+        <GrassTuft x={340} y={360} s={1.1} color={BONE} />
+        <GrassTuft x={740} y={366} s={1.0} color={BONE} />
+        <GrassTuft x={1140} y={362} s={1.0} color={BONE} />
+      </g>
+
+      <Sparkle x={368} y={128} s={0.85} />
+      <DashMark x={510} y={286} s={1.0} />
+      <Sparkle x={1006} y={252} s={0.7} />
+      <Speckles x={640} y={300} />
+      <Speckles x={1200} y={280} color={BONE} />
+
+      <rect width="1440" height="380" filter={`url(#grain-${uid})`} opacity={0.65} fill="transparent" />
+    </svg>
+  )
+}

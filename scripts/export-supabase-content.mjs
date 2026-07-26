@@ -8,7 +8,9 @@ import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const outDir = resolve(root, 'content-import')
+// 支持 --out <目录>：部署流程用它把导出结果放进 dist/export 随站发布
+const outArg = process.argv.indexOf('--out')
+const outDir = resolve(root, outArg > -1 ? process.argv[outArg + 1] : 'content-import')
 
 const url = process.env.VITE_SUPABASE_URL
 const key = process.env.VITE_SUPABASE_ANON_KEY
@@ -63,5 +65,13 @@ for (const row of rows) {
 }
 
 writeFileSync(resolve(outDir, '_清单.md'), `# Supabase 导出清单（${rows.length} 篇）\n\n${lines.join('\n')}\n`)
-console.log(`[export] 已导出 ${rows.length} 篇到 content-import/`)
+writeFileSync(
+  resolve(outDir, 'index.json'),
+  JSON.stringify(
+    rows.map((r) => ({ slug: r.slug, type: r.type, title: r.title, date: r.published_date, category: r.category })),
+    null,
+    2,
+  ) + '\n',
+)
+console.log(`[export] 已导出 ${rows.length} 篇到 ${outDir}`)
 console.log(lines.join('\n'))

@@ -1,13 +1,11 @@
 name: Export old Supabase content
 
-# 一次性迁移任务：把旧 Help Myself 的已发布文章导出为 Markdown，
-# 提交到 supabase-export 分支供审核（不影响线上）。
-# 推送本文件时自动运行一次，之后可在 Actions 页手动触发。
+# 一次性迁移任务（手动触发）：把旧 Help Myself 的已发布文章导出为 Markdown。
+# 注意：GITHUB_TOKEN 无仓库写权限时推分支会失败（exit 128），
+# 需先在 Settings → Actions → Workflow permissions 开启 Read and write。
+# 常规迁移走 deploy.yml 的「Export legacy Supabase content into dist」通道。
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/export-content.yml']
 
 permissions:
   contents: write

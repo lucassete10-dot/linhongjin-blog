@@ -29,6 +29,14 @@ jobs:
         run: npm ci
       - name: Build website
         run: npm run build
+      - name: Export legacy Supabase content into dist
+        # 一次性迁移通道：Actions 令牌无仓库写权限推不了分支，
+        # 改为把导出结果随 Pages 发布到 /export/，本地拉取审核后入库。
+        # 内容均为旧站已公开发布的文章，不含隐私。失败不影响部署。
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: node scripts/export-supabase-content.mjs --out dist/export || echo "export skipped"
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages artifact

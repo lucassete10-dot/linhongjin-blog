@@ -5,8 +5,31 @@
 body {
   font-family: 'Geist', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
   overflow-x: hidden;
-  background: #f7f1e3;
+  /* 与首屏视频的纸色一致，上下背景统一 */
+  background: #f1ede1;
   color: #1a1a1a;
+}
+
+/* 滚动进入视口时的淡入上浮 */
+.reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.7s cubic-bezier(0.2, 0.7, 0.3, 1),
+    transform 0.7s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 /* 纸张肌理：全页颗粒层（fixed + pointer-events-none，不参与重绘滚动） */
