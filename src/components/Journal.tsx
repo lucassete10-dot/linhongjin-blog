@@ -30,7 +30,7 @@ export function Journal() {
       <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="mb-2 font-display text-sm uppercase tracking-[0.18em] text-wandor-prompt">Field Notes</p>
-          <h2 className="font-sans text-[34px] font-medium tracking-[-0.02em] text-wandor-text max-md:text-[28px]">
+          <h2 className="font-cn text-[36px] font-bold tracking-[0.01em] text-wandor-text max-md:text-[28px]">
             {query ? `搜索「${query}」` : activeCat ? `${activeCat}的笔记` : '最近的文章'}
           </h2>
         </div>

@@ -37,7 +37,7 @@ export function Article() {
         <p className="mb-3 font-sans text-[12px] font-semibold uppercase tracking-[0.14em] text-wandor-prompt">
           {post.kind}{post.place ? ` · ${post.place}` : ''}
         </p>
-        <h1 className="mb-5 max-w-[620px] font-sans text-[clamp(30px,5vw,44px)] font-semibold leading-[1.25] tracking-[-0.02em] text-wandor-text">
+        <h1 className="mb-5 max-w-[620px] font-cn text-[clamp(30px,5vw,46px)] font-bold leading-[1.3] tracking-[0.01em] text-wandor-text">
           {post.title}
         </h1>
         <div className="flex flex-wrap items-center gap-3 font-sans text-[13px] text-wandor-muted">
@@ -77,7 +77,7 @@ export function Article() {
       >
         <div>
           <p className="mb-1 font-sans text-[11px] font-semibold uppercase tracking-[0.14em] text-wandor-muted">下一篇</p>
-          <p className="font-sans text-[18px] font-semibold tracking-[-0.01em] text-wandor-text">{next.title}</p>
+          <p className="font-cn text-[19px] font-bold tracking-[0.01em] text-wandor-text">{next.title}</p>
         </div>
         <ArrowRight className="h-5 w-5 flex-shrink-0 text-wandor-prompt transition-transform group-hover:translate-x-1" />
       </Link>

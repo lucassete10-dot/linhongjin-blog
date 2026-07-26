@@ -6,6 +6,7 @@ export default {
       fontFamily: {
         sans: ['Geist', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'sans-serif'],
         display: ['Special Elite', 'Courier New', 'serif'],
+        cn: ['LXGW WenKai', 'Kaiti SC', 'STKaiti', 'KaiTi', 'serif'],
       },
       colors: {
         wandor: {
