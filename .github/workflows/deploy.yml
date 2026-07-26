@@ -1,4 +1,4 @@
-name: Deploy Help Myself to GitHub Pages
+name: Deploy wandor to GitHub Pages
 
 on:
   push:
@@ -28,9 +28,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build website
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: npm run build
       - name: Configure Pages
         uses: actions/configure-pages@v5

@@ -1,37 +1,16 @@
-# Help Myself
+# wandor · 纸上行迹
 
-Flora 的 AI 学习与探索空间。面向对 AI 感兴趣的同学，分享工具体验、学习记录、播客感悟与个人项目。
+一本写在路上的旅行博客，部署在 [linhongjin.top](https://linhongjin.top)。
 
-品牌口号：**Help myself, help others.**
+视觉语言来自 Wandor 式的暖纸手绘插画：奶油纸底、赭石与橄榄绿的风景、
+打字机字标、毛玻璃卡片。所有文章封面都是手绘 SVG（山有等高线、树有枝脉、
+坡上有草茬），配合位移滤镜与噪点，形成版画式的颗粒质感。
 
-## 技术结构
+## 技术
 
-- React + Vite：网站与可视化后台
-- GitHub Pages：静态网站托管与自定义域名
-- Supabase Auth：Flora 管理员邮箱密码登录
-- Supabase Postgres：文章和工具等内容
-- Supabase Storage：封面图片
-- Row Level Security：公开访客只读，Flora 管理员可写
-
-## 文档
-
-- [产品需求文档](docs/PRODUCT_SPEC.md)
-- [页面与交互蓝图](docs/UX_BLUEPRINT.md)
-- [后台内容模型](docs/CMS_CONTENT_MODEL.md)
-- [后台使用说明](docs/ADMIN_GUIDE.md)
-- [Supabase 初始化](supabase/README.md)
-- [Flora 品牌主视觉](assets/brand/flora-hero-v1.png)
-
-## 本地配置
-
-复制 `.env.example` 为 `.env.local`，填写 Supabase 项目的 Project URL 和 Publishable/anon key：
-
-```text
-VITE_SUPABASE_URL=...
-VITE_SUPABASE_ANON_KEY=...
-```
-
-`service_role` 密钥绝不能放进前端或任何 `VITE_` 变量。
+- Vite + React + TypeScript + Tailwind CSS + lucide-react
+- HashRouter，纯静态构建，GitHub Pages 托管
+- 首页背景为视频素材，加载失败时回退到同风格的手绘 SVG 底稿
 
 ## 本地运行
 
@@ -40,18 +19,12 @@ npm install
 npm run dev
 ```
 
-## 检查
-
-```bash
-npm run build
-npm run qa:visual
-```
-
 ## 部署
 
-推送到 `main` 后，GitHub Actions 会构建 `dist` 并部署至 GitHub Pages。Actions 需要以下仓库 secrets：
+推送到 `main` 后，GitHub Actions 自动构建 `dist` 并发布到 GitHub Pages。
+自定义域名由 `public/CNAME` 与 GitHub Pages 设置共同管理。
 
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_ANON_KEY`
+## 写文章
 
-自定义域名由 `public/CNAME` 和 GitHub Pages 设置共同管理，当前为 `linhongjin.top`。
+文章数据在 `src/data/posts.ts`：新增一个 `Post` 对象（标题、日期、摘要、
+正文段落、封面图案 `motif` 与配色 `palette`），构建后自动出现在列表里。

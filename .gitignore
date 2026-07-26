@@ -1,9 +1,4 @@
-node_modules/
-dist/
-tmp/
-*.tsbuildinfo
-.env
-.env.*
-!.env.example
-.vscode/
-data/
+node_modules
+dist
+*.local
+.DS_Store

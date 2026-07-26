@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Geist', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  overflow-x: hidden;
+  background: #f7f1e3;
+  color: #1a1a1a;
+}
+
+/* 纸张肌理：全页颗粒层（fixed + pointer-events-none，不参与重绘滚动） */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.75;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.065 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+::selection {
+  background: #905831;
+  color: #f7f1e3;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* 中文正文的阅读设置 */
+.article-prose p {
+  margin: 0 0 1.2em;
+  line-height: 2;
+  text-align: justify;
+}
+.article-prose h2 {
+  margin: 2em 0 0.9em;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.article-prose blockquote {
+  margin: 1.8em 0;
+  padding: 0.2em 0 0.2em 1.4em;
+  border-left: 3px solid #b0562f;
+  color: #905831;
+  line-height: 1.9;
+}
+.article-prose ul {
+  margin: 0 0 1.2em;
+  padding-left: 1.4em;
+  line-height: 2;
+  list-style: none;
+}
+.article-prose ul li::before {
+  content: '— ';
+  color: #b0562f;
+}
