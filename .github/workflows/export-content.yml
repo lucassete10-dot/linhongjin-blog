@@ -33,9 +33,16 @@ jobs:
           cat export.log >> "$GITHUB_STEP_SUMMARY"
       - name: Commit to supabase-export branch
         run: |
+          set -x
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout -B supabase-export
-          git add content-import
+          git add -f content-import
           git commit -m "chore: 导出 Supabase 旧文章供审核" || echo "nothing to commit"
-          git push -f origin supabase-export
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" supabase-export
+      - name: Upload export artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: supabase-export
+          path: content-import
