@@ -80,13 +80,12 @@ function useRevealOnScroll() {
   }, [pathname, search])
 }
 
-/* 与插画同风格的线描云，用于页尾风景带的飘云动画 */
-function DriftCloud({ style, scale = 1 }: { style?: React.CSSProperties; scale?: number }) {
+/* 与插画同风格的线描云 */
+function CloudShape({ scale = 1, dy = 0 }: { scale?: number; dy?: number }) {
   return (
     <svg
       viewBox="0 0 140 56"
-      className="cloud-drift"
-      style={{ width: `${140 * scale}px`, height: `${56 * scale}px`, ...style }}
+      style={{ width: `${140 * scale}px`, height: `${56 * scale}px`, transform: `translateY(${dy}px)`, flexShrink: 0 }}
       aria-hidden="true"
     >
       <path
@@ -98,6 +97,31 @@ function DriftCloud({ style, scale = 1 }: { style?: React.CSSProperties; scale?:
         opacity={0.95}
       />
     </svg>
+  )
+}
+
+/* 无缝飘云带：半组内容 + 完全相同的另一半，整条向右平移循环 */
+function CloudTrack({ top, duration, scale = 1 }: { top: string; duration: number; scale?: number }) {
+  const half = (key: string) => (
+    <div key={key} className="flex" style={{ width: '2800px' }}>
+      <div style={{ marginLeft: '140px' }}>
+        <CloudShape scale={scale} dy={0} />
+      </div>
+      <div style={{ marginLeft: '880px' }}>
+        <CloudShape scale={scale * 0.78} dy={18} />
+      </div>
+      <div style={{ marginLeft: '800px' }}>
+        <CloudShape scale={scale * 0.9} dy={-8} />
+      </div>
+    </div>
+  )
+  return (
+    <div className="cloud-track" style={{ top }}>
+      <div className="cloud-track-inner" style={{ ['--marquee-duration' as string]: `${duration}s` }}>
+        {half('a')}
+        {half('b')}
+      </div>
+    </div>
   )
 }
 
@@ -180,10 +204,9 @@ export default function App() {
           className="absolute inset-0 h-full w-full object-cover"
           style={{ objectPosition: '50% 20%' }}
         />
-        {/* 飘云层：左进右出，匀速循环 */}
-        <DriftCloud style={{ top: '8%', ['--drift-duration' as string]: '85s', ['--drift-delay' as string]: '-30s' }} scale={1} />
-        <DriftCloud style={{ top: '20%', ['--drift-duration' as string]: '120s', ['--drift-delay' as string]: '-80s' }} scale={0.72} />
-        <DriftCloud style={{ top: '3%', ['--drift-duration' as string]: '100s', ['--drift-delay' as string]: '-58s' }} scale={0.85} />
+        {/* 飘云层：两条不同速度的无缝云带，持续向右流动 */}
+        <CloudTrack top="4%" duration={110} scale={1} />
+        <CloudTrack top="20%" duration={170} scale={0.68} />
         {/* 上缘融入纸色页面 */}
         <div
           className="absolute inset-x-0 top-0 h-20"

@@ -32,29 +32,36 @@ body {
   }
 }
 
-/* 页尾风景带上的飘云：从画面左外侧匀速飘到右外侧，无限循环。
-   linear + transform 走合成器，不会一卡一卡。 */
-@keyframes cloud-drift {
+/* 页尾风景带上的飘云：跑马灯式无缝循环。
+   云带内容前后两半完全相同，整条从 -50% 匀速平移到 0（向右流动），
+   到 0 的瞬间与 -50% 的画面完全一致，肉眼看不到任何循环点。 */
+@keyframes cloud-marquee {
   from {
-    transform: translate3d(-260px, 0, 0);
+    transform: translate3d(-50%, 0, 0);
   }
   to {
-    transform: translate3d(calc(100vw + 260px), 0, 0);
+    transform: translate3d(0, 0, 0);
   }
 }
 
-.cloud-drift {
+.cloud-track {
   position: absolute;
   left: 0;
-  animation: cloud-drift var(--drift-duration, 90s) linear infinite;
-  animation-delay: var(--drift-delay, 0s);
+  width: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.cloud-track-inner {
+  display: flex;
+  width: max-content;
+  animation: cloud-marquee var(--marquee-duration, 120s) linear infinite;
   will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cloud-drift {
+  .cloud-track-inner {
     animation: none;
-    left: 30%;
   }
 }
 
