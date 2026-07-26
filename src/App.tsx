@@ -4,7 +4,6 @@ import { Hero } from '@/components/Hero'
 import { Journal } from '@/components/Journal'
 import { Article } from '@/components/Article'
 import { SiteNav } from '@/components/SiteNav'
-import { QuanzhouScene } from '@/components/Scene'
 import { posts } from '@/data/posts'
 
 declare global {
@@ -81,6 +80,27 @@ function useRevealOnScroll() {
   }, [pathname, search])
 }
 
+/* 与插画同风格的线描云，用于页尾风景带的飘云动画 */
+function DriftCloud({ style, scale = 1 }: { style?: React.CSSProperties; scale?: number }) {
+  return (
+    <svg
+      viewBox="0 0 140 56"
+      className="cloud-drift"
+      style={{ width: `${140 * scale}px`, height: `${56 * scale}px`, ...style }}
+      aria-hidden="true"
+    >
+      <path
+        d="M22 44 C8 44 4 30 18 26 C18 12 40 6 51 16 C58 4 82 4 89 16 C106 10 122 24 113 36 C122 44 110 48 99 46 Z"
+        fill="#f5efdf"
+        stroke="#b8a88f"
+        strokeWidth={2.5}
+        strokeLinejoin="round"
+        opacity={0.95}
+      />
+    </svg>
+  )
+}
+
 function Footer() {
   return (
     <footer className="mx-auto flex max-w-page flex-wrap items-end justify-between gap-4 border-t border-[#e0d2b2] px-20 py-10 max-md:px-6">
@@ -151,9 +171,24 @@ export default function App() {
         <Route path="/about" element={<About />} />
         <Route path="/post/:slug" element={<Article />} />
       </Routes>
-      {/* 页尾的泉州风景带：东西塔、钟楼、红砖厝、清净寺、洛阳桥 */}
-      <div aria-hidden="true" className="reveal pointer-events-none relative mt-16 h-[300px] w-full overflow-hidden max-md:h-[200px]">
-        <QuanzhouScene />
+      {/* 页尾的泉州风景带：东西塔、老君岩、清净寺、关帝庙与洛阳桥 */}
+      <div aria-hidden="true" className="reveal pointer-events-none relative mt-16 h-[480px] w-full overflow-hidden max-md:h-[260px]">
+        <img
+          src="/media/quanzhou-scene.jpg"
+          alt=""
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ objectPosition: '50% 20%' }}
+        />
+        {/* 飘云层：左进右出，匀速循环 */}
+        <DriftCloud style={{ top: '8%', ['--drift-duration' as string]: '85s', ['--drift-delay' as string]: '-30s' }} scale={1} />
+        <DriftCloud style={{ top: '20%', ['--drift-duration' as string]: '120s', ['--drift-delay' as string]: '-80s' }} scale={0.72} />
+        <DriftCloud style={{ top: '3%', ['--drift-duration' as string]: '100s', ['--drift-delay' as string]: '-58s' }} scale={0.85} />
+        {/* 上缘融入纸色页面 */}
+        <div
+          className="absolute inset-x-0 top-0 h-20"
+          style={{ background: 'linear-gradient(180deg, #f1ede1 0%, rgba(241,237,225,0) 100%)' }}
+        />
       </div>
       <Footer />
     </div>
