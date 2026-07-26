@@ -4,6 +4,7 @@ import { Hero } from '@/components/Hero'
 import { Journal } from '@/components/Journal'
 import { Article } from '@/components/Article'
 import { SiteNav } from '@/components/SiteNav'
+import { AlbumHome } from '@/components/AlbumHome'
 import { posts } from '@/data/posts'
 
 declare global {
@@ -186,34 +187,40 @@ function About() {
 export default function App() {
   const { pathname } = useLocation()
   useRevealOnScroll()
+  const isAlbumHome = pathname === '/'
   return (
     <div className="min-h-svh w-full">
       <ScrollToTop />
-      {pathname !== '/' && <SiteNav />}
+      {!isAlbumHome && pathname !== '/articles' && <SiteNav />}
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<AlbumHome />} />
+        <Route path="/articles" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/post/:slug" element={<Article />} />
       </Routes>
-      {/* 页尾的泉州风景带：东西塔、老君岩、清净寺、关帝庙与洛阳桥 */}
-      <div aria-hidden="true" className="reveal pointer-events-none relative mt-16 h-[480px] w-full overflow-hidden max-md:h-[260px]">
-        <img
-          src="/media/quanzhou-scene.jpg"
-          alt=""
-          loading="lazy"
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: '50% 20%' }}
-        />
-        {/* 飘云层：两条不同速度的无缝云带，持续向右流动 */}
-        <CloudTrack top="4%" duration={110} scale={1} />
-        <CloudTrack top="20%" duration={170} scale={0.68} />
-        {/* 上缘融入纸色页面 */}
-        <div
-          className="absolute inset-x-0 top-0 h-20"
-          style={{ background: 'linear-gradient(180deg, #f1ede1 0%, rgba(241,237,225,0) 100%)' }}
-        />
-      </div>
-      <Footer />
+      {/* 泉州风景带与页脚：相册首页整屏无滚动，不渲染 */}
+      {!isAlbumHome && (
+        <>
+          <div aria-hidden="true" className="reveal pointer-events-none relative mt-16 h-[480px] w-full overflow-hidden max-md:h-[260px]">
+            <img
+              src="/media/quanzhou-scene.jpg"
+              alt=""
+              loading="lazy"
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ objectPosition: '50% 20%' }}
+            />
+            {/* 飘云层：两条不同速度的无缝云带，持续向右流动 */}
+            <CloudTrack top="4%" duration={110} scale={1} />
+            <CloudTrack top="20%" duration={170} scale={0.68} />
+            {/* 上缘融入纸色页面 */}
+            <div
+              className="absolute inset-x-0 top-0 h-20"
+              style={{ background: 'linear-gradient(180deg, #f1ede1 0%, rgba(241,237,225,0) 100%)' }}
+            />
+          </div>
+          <Footer />
+        </>
+      )}
     </div>
   )
 }

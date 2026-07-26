@@ -22,12 +22,12 @@ export function SiteNav() {
   }
 
   const goCategory = (category: Category) => {
-    navigate(`/?cat=${encodeURIComponent(category)}`)
+    navigate(`/articles?cat=${encodeURIComponent(category)}`)
     scrollJournal()
   }
 
   const goJournal = () => {
-    navigate('/')
+    navigate('/articles')
     scrollJournal()
   }
 

@@ -48,13 +48,19 @@ jobs:
       - name: Transcode background video to 1080p
         # 原素材是 4K/17MB：低配设备解码吃力、加载慢时首页会停在底稿画面。
         # 转成 1080p + faststart（边下边播），体积约降到 1/4，几乎秒出。
+        # 注意：新版 runner 镜像不预装 ffmpeg（缺失时 exit 127），需现装；
+        # 转码失败不阻塞部署，退回原视频。
         run: |
           if [ -f dist/media/wandor-bg.mp4 ]; then
-            ffmpeg -hide_banner -loglevel error -y -i dist/media/wandor-bg.mp4 \
+            sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg > /dev/null 2>&1 || true
+            if command -v ffmpeg > /dev/null && ffmpeg -hide_banner -loglevel error -y -i dist/media/wandor-bg.mp4 \
               -vf "scale=1920:-2" -c:v libx264 -crf 24 -preset medium -an \
-              -movflags +faststart dist/media/wandor-bg-1080.mp4
-            mv dist/media/wandor-bg-1080.mp4 dist/media/wandor-bg.mp4
-            echo "transcoded:" && ls -la dist/media
+              -movflags +faststart dist/media/wandor-bg-1080.mp4; then
+              mv dist/media/wandor-bg-1080.mp4 dist/media/wandor-bg.mp4
+              echo "transcoded:" && ls -la dist/media
+            else
+              echo "::warning::transcode unavailable, shipping original video"
+            fi
           fi
       - name: Configure Pages
         uses: actions/configure-pages@v5

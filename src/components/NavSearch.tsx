@@ -9,7 +9,7 @@ export function NavSearch() {
   const submit = (event: FormEvent) => {
     event.preventDefault()
     const query = value.trim()
-    navigate(query ? `/?q=${encodeURIComponent(query)}` : '/')
+    navigate(query ? `/articles?q=${encodeURIComponent(query)}` : '/articles')
     window.setTimeout(() => document.getElementById('journal')?.scrollIntoView({ behavior: 'smooth' }), 120)
   }
 
