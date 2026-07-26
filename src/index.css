@@ -114,3 +114,28 @@ html {
   content: '— ';
   color: #b0562f;
 }
+
+/* 文中内嵌的 B站 / YouTube 播放器 */
+.article-prose .video-embed {
+  display: block;
+  margin: 1.6em 0 0.4em;
+  text-indent: 0;
+}
+.article-prose .video-embed iframe {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid #e5d8ba;
+  border-radius: 18px;
+  background: #eee8d8;
+}
+.article-prose .video-source-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #905831;
+  text-decoration: none;
+}
+.article-prose .video-source-link:hover {
+  opacity: 0.7;
+}
