@@ -34,9 +34,23 @@ export function Hero({ onShuffle, onRead }: HeroProps) {
       window.removeEventListener('pointerdown', onFirstPointer)
     }
     window.addEventListener('pointerdown', onFirstPointer)
+    // 滚出视野就暂停：4K 解码在后台跑会拖累整页动画的帧率
+    let pausedByScroll = false
+    const onScroll = () => {
+      const outOfView = video.getBoundingClientRect().bottom <= 0
+      if (outOfView && !pausedByScroll) {
+        pausedByScroll = true
+        video.pause()
+      } else if (!outOfView && pausedByScroll) {
+        pausedByScroll = false
+        tryPlay()
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
     return () => {
       video.removeEventListener('canplay', tryPlay)
       window.removeEventListener('pointerdown', onFirstPointer)
+      window.removeEventListener('scroll', onScroll)
     }
   }, [])
 
