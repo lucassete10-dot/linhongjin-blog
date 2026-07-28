@@ -2,59 +2,36 @@ import { Link, useNavigate } from 'react-router-dom'
 import { categories, type Category } from '@/data/posts'
 import { NavSearch } from './NavSearch'
 
-function NavButton({ label, onClick }: { label: string; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="cursor-pointer border-none bg-transparent font-sans text-[15px] font-medium uppercase tracking-[0.04em] text-wandor-text transition-opacity hover:opacity-55"
-    >
-      {label}
-    </button>
-  )
-}
-
 export function SiteNav() {
   const navigate = useNavigate()
 
-  const scrollJournal = () => {
-    window.setTimeout(() => document.getElementById('journal')?.scrollIntoView({ behavior: 'smooth' }), 90)
-  }
-
   const goCategory = (category: Category) => {
     navigate(`/articles?cat=${encodeURIComponent(category)}`)
-    scrollJournal()
-  }
-
-  const goJournal = () => {
-    navigate('/articles')
-    scrollJournal()
   }
 
   return (
-    <nav className="relative z-10 mx-auto flex max-w-[1360px] items-center justify-between px-20 pb-4 pt-6 max-md:px-6 max-md:pt-5">
-      <Link
-        to="/"
-        className="select-none whitespace-nowrap font-display text-[40px] leading-none text-black max-md:text-[26px]"
-      >
-        wandor
+    <nav className="sticky top-0 z-50 flex h-[74px] w-full items-center justify-between border-b border-slate-200/80 bg-white/90 px-8 backdrop-blur-xl max-md:h-[64px] max-md:px-4">
+      <Link to="/" className="flex items-center gap-2.5 whitespace-nowrap font-sans text-[17px] font-bold tracking-[-0.04em] text-slate-950">
+        <span className="grid h-8 w-8 place-items-center rounded-[10px] bg-slate-950 text-[9px] font-bold tracking-[-0.02em] text-white">HM</span>
+        <span>Help Myself</span>
       </Link>
-      <div className="absolute left-1/2 flex -translate-x-1/2 gap-8 max-md:hidden">
+
+      <div className="absolute left-1/2 flex -translate-x-1/2 items-center gap-8 max-lg:hidden">
+        <Link to="/" className="font-sans text-[13px] font-semibold text-slate-600 transition-colors hover:text-slate-950">首页</Link>
         {categories.map((category) => (
-          <NavButton key={category} label={category} onClick={() => goCategory(category)} />
+          <button
+            key={category}
+            type="button"
+            onClick={() => goCategory(category)}
+            className="cursor-pointer border-none bg-transparent font-sans text-[13px] font-semibold text-slate-600 transition-colors hover:text-slate-950"
+          >
+            {category}
+          </button>
         ))}
-        <NavButton label="关于" onClick={() => navigate('/about')} />
+        <Link to="/about" className="font-sans text-[13px] font-semibold text-slate-600 transition-colors hover:text-slate-950">关于</Link>
       </div>
-      <div className="flex items-center gap-3">
-        <NavSearch />
-        <button
-          type="button"
-          onClick={goJournal}
-          className="cursor-pointer whitespace-nowrap rounded-full border-none bg-wandor-dark px-5 py-3.5 font-sans text-[15px] font-medium uppercase tracking-[0.04em] text-[#fafafa] transition-all hover:bg-[#333] active:scale-95 max-md:px-4 max-md:py-2.5 max-md:text-[13px]"
-        >
-          开始阅读
-        </button>
-      </div>
+
+      <NavSearch />
     </nav>
   )
 }
