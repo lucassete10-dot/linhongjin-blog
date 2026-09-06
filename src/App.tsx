@@ -107,7 +107,14 @@ function SearchDialog({ open, close }: { open: boolean; close: () => void }) {
     <dialog
       ref={dialog}
       className="search-dialog"
-      onClose={close}
+      onCancel={(event) => {
+        event.preventDefault();
+        close();
+      }}
+      onClose={() => {
+        // A queued close event may arrive after the dialog has reopened.
+        if (!dialog.current?.open) close();
+      }}
       onClick={(e) => {
         if (e.target === e.currentTarget) close();
       }}
