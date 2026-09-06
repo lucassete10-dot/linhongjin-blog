@@ -1,4 +1,4 @@
-name: Deploy wandor to GitHub Pages
+name: Deploy Lin to GitHub Pages
 
 on:
   push:
@@ -29,39 +29,6 @@ jobs:
         run: npm ci
       - name: Build website
         run: npm run build
-      - name: Export legacy Supabase content into dist
-        # 一次性迁移通道：Actions 令牌无仓库写权限推不了分支，
-        # 改为把导出结果随 Pages 发布到 /export/，本地拉取审核后入库。
-        # 内容均为旧站已公开发布的文章，不含隐私。失败不影响部署。
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-        run: |
-          if out=$(node scripts/export-supabase-content.mjs --out dist/export 2>&1); then
-            echo "$out"
-            echo "export ok:" && ls dist/export
-          else
-            echo "$out"
-            short=$(echo "$out" | tail -c 380 | tr '\n' ' ')
-            echo "::warning::legacy export failed: $short"
-          fi
-      - name: Transcode background video to 1080p
-        # 原素材是 4K/17MB：低配设备解码吃力、加载慢时首页会停在底稿画面。
-        # 转成 1080p + faststart（边下边播），体积约降到 1/4，几乎秒出。
-        # 注意：新版 runner 镜像不预装 ffmpeg（缺失时 exit 127），需现装；
-        # 转码失败不阻塞部署，退回原视频。
-        run: |
-          if [ -f dist/media/wandor-bg.mp4 ]; then
-            sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg > /dev/null 2>&1 || true
-            if command -v ffmpeg > /dev/null && ffmpeg -hide_banner -loglevel error -y -i dist/media/wandor-bg.mp4 \
-              -vf "scale=1920:-2" -c:v libx264 -crf 24 -preset medium -an \
-              -movflags +faststart dist/media/wandor-bg-1080.mp4; then
-              mv dist/media/wandor-bg-1080.mp4 dist/media/wandor-bg.mp4
-              echo "transcoded:" && ls -la dist/media
-            else
-              echo "::warning::transcode unavailable, shipping original video"
-            fi
-          fi
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages artifact
