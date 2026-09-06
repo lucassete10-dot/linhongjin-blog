@@ -1,4 +1,4 @@
-name: Check wandor build
+name: Check Lin build
 
 on:
   pull_request:
@@ -23,3 +23,7 @@ jobs:
         run: npm ci
       - name: Build website
         run: npm run build
+      - name: Install test browser
+        run: npx playwright install --with-deps chromium
+      - name: Browser checks
+        run: npm run test:e2e
